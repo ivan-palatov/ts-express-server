@@ -6,6 +6,7 @@
   ],
   "rules": {
     "no-console": false,
-    "import-name": false
+    "import-name": false,
+    "prefer-const": false
   }
 }
