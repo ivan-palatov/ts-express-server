@@ -1,7 +1,7 @@
 import express = require("express");
 import expressStaticGzip = require("express-static-gzip");
 
-// Apply all middleware before routes
+// Apply all middleware before api and web routes
 
 const app = express();
 
