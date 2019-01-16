@@ -1,24 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.index = (req, res) => {
+const express = require("express");
+const router = express.Router();
+exports.authController = router;
+router.get("/", (req, res) => {
     res.render("auth", { text: "List of users" });
-};
-exports.create = (req, res) => {
+});
+router.get("/create", (req, res) => {
     res.render("auth", { text: "Make user here" });
-};
-exports.store = (req, res) => {
+});
+router.post("/", (req, res) => {
     res.render("auth", { text: "Your user is being created" });
-};
-exports.show = (req, res) => {
+});
+router.get("/:id", (req, res) => {
     res.render("auth", { text: `User ${req.params.id} is being shown.` });
-};
-exports.edit = (req, res) => {
+});
+router.get("/:id/edit", (req, res) => {
     res.render("auth", { text: `Edit page for ${req.params.id} user.` });
-};
-exports.update = (req, res) => {
+});
+router.patch("/:id", (req, res) => {
     res.render("auth", { text: `User ${req.params.id} is being updated.` });
-};
-exports.destroy = (req, res) => {
+});
+router.delete("/:id", (req, res) => {
     res.render("auth", { text: `You deleted ${req.params.id} user.` });
-};
+});
 //# sourceMappingURL=auth.js.map

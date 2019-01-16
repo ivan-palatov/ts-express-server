@@ -1,21 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
-const authController = require("../controllers/auth");
-const api_1 = require("./api");
-// Auth routes
-const authRouter = express.Router();
-authRouter.get('/', authController.index);
-authRouter.get('/create', authController.create);
-authRouter.post('/', authController.store);
-authRouter.get('/:id', authController.show);
-authRouter.get('/:id/edit', authController.edit);
-authRouter.patch('/:id', authController.update);
-authRouter.delete('/:id', authController.destroy);
-api_1.default.use("/auth", authRouter);
+const router = express.Router();
+exports.webRoutes = router;
+const auth_1 = require("../controllers/auth");
+// All authentication routes
+router.use('/auth', auth_1.authController);
 // Other routes
-api_1.default.get("*", (req, res) => {
+router.get("*", (req, res) => {
     res.render("index", { stuff: "Realy cool paragraph." });
 });
-exports.default = api_1.default;
 //# sourceMappingURL=web.js.map

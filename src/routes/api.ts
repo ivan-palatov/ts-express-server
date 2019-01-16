@@ -1,11 +1,8 @@
 import express = require("express");
-import app from "../middleware";
-const apiRouter = express.Router();
+const router = express.Router();
 
-apiRouter.get("*", (req, res) => {
+router.get("*", (req, res) => {
   res.json({ test: "This is api in work." });
 });
 
-app.use("/api", apiRouter);
-
-export default app;
+export { router as apiRoutes };
