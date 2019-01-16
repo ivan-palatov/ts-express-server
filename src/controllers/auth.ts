@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
     })
     .catch(err => {
       res.render("auth", { text: `Something went wrong. ${err}` });
-    })
+    });
 });
 
 // Show create user form

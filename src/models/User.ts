@@ -1,5 +1,8 @@
 import bcrypt = require("bcrypt");
-import { InstanceType, ModelType, pre, prop, Typegoose } from "typegoose";
+import * as paginate from "mongoose-paginate";
+import { plugin, pre, prop, Typegoose } from "typegoose";
+
+import { IPaginateOptions, IPaginateResult } from "../utils/interfaces";
 
 enum Gender {
   MALE = "male",
@@ -17,7 +20,14 @@ enum Gender {
   this.password = passwordHash;
   next();
 })
+@plugin(paginate)
 class User extends Typegoose {
+  static paginate: (
+    query?: object,
+    options?: IPaginateOptions,
+    callback?: (err: any, result: IPaginateResult<User>) => void
+  ) => Promise<IPaginateResult<User>>;
+
   @prop({ unique: true, index: true, required: true })
   name: string;
 
