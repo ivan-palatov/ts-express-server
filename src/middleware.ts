@@ -1,3 +1,5 @@
+import bodyParser = require("body-parser");
+import compression = require("compression");
 import express = require("express");
 import expressStaticGzip = require("express-static-gzip");
 
@@ -9,7 +11,13 @@ const app = express();
 
 // Apply all middleware here
 
-// Make server work with gz and br compression
+// Apply compression on response
+app.use(compression());
+// Parse the body into middleware before request handlers
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Make server serve static pre-compressed files using gzip or brotli algoritms
 app.use(
   expressStaticGzip("public", {
     enableBrotli: true

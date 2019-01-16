@@ -11,6 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt = require("bcrypt");
 const typegoose_1 = require("typegoose");
+var Gender;
+(function (Gender) {
+    Gender["MALE"] = "male";
+    Gender["FEMALE"] = "female";
+})(Gender || (Gender = {}));
 let User = class User extends typegoose_1.Typegoose {
 };
 __decorate([
@@ -25,6 +30,14 @@ __decorate([
     typegoose_1.prop({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", Number)
+], User.prototype, "age", void 0);
+__decorate([
+    typegoose_1.prop({ required: true }),
+    __metadata("design:type", String)
+], User.prototype, "gender", void 0);
 User = __decorate([
     typegoose_1.pre("save", function (next) {
         const pw = this.password;

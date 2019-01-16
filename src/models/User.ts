@@ -1,6 +1,11 @@
 import bcrypt = require("bcrypt");
 import { InstanceType, ModelType, pre, prop, Typegoose } from "typegoose";
 
+enum Gender {
+  MALE = "male",
+  FEMALE = "female"
+}
+
 @pre<User>("save", function(next) {
   const pw = this.password;
   let passwordHash: string;
@@ -12,7 +17,6 @@ import { InstanceType, ModelType, pre, prop, Typegoose } from "typegoose";
   this.password = passwordHash;
   next();
 })
-
 class User extends Typegoose {
   @prop({ unique: true, index: true, required: true })
   name: string;
@@ -25,6 +29,9 @@ class User extends Typegoose {
 
   @prop()
   age?: number;
+
+  @prop({ required: true })
+  gender: Gender;
 }
 
 const userModel = new User().getModelForClass(User);

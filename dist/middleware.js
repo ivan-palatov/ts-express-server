@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const bodyParser = require("body-parser");
+const compression = require("compression");
 const express = require("express");
 const expressStaticGzip = require("express-static-gzip");
 // Routes import statements
@@ -9,7 +11,12 @@ const web_1 = require("./routes/web");
 const app = express();
 exports.app = app;
 // Apply all middleware here
-// Make server work with gz and br compression
+// Apply compression on response
+app.use(compression());
+// Parse the body into middleware before request handlers
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// Make server serve static pre-compressed files using gzip or brotli algoritms
 app.use(expressStaticGzip("public", {
     enableBrotli: true
 }));
