@@ -8,6 +8,9 @@
     "no-console": false,
     "import-name": true,
     "prefer-const": false,
-    "no-default-export": true
+    "no-default-export": true,
+    "member-access": false,
+    "only-arrow-functions": false,
+    "ter-prefer-arrow-callback": false
   }
 }
