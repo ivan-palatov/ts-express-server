@@ -8,8 +8,6 @@ import expressStaticGzip = require("express-static-gzip");
 import mongoose = require("mongoose");
 import { passport } from "./passport";
 
-// import { connectString } from "./main";
-
 // Routes import statements
 import { apiRoutes } from "./routes/api";
 import { webRoutes } from "./routes/web";

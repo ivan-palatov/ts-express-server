@@ -4,8 +4,9 @@ const express = require("express");
 const router = express.Router();
 exports.authController = router;
 const User_1 = require("../models/User");
+const passport_1 = require("../passport");
 // Show list of users
-router.get("/", (req, res) => {
+router.get("/list", (req, res) => {
     User_1.User.find()
         .then(docs => {
         res.render("auth", { text: `List of users: ${docs}` });
@@ -15,11 +16,11 @@ router.get("/", (req, res) => {
     });
 });
 // Show create user form
-router.get("/create", (req, res) => {
+router.get("/", (req, res) => {
     res.render("auth", { text: "Make user here" });
 });
 // Create a new user
-router.post("/", (req, res) => {
+router.post("/", passport_1.passport.authenticate('local', { failureRedirect: "/auth" }), (req, res) => {
     res.render("auth", { text: "Your user is being created" });
 });
 // Show a user by id

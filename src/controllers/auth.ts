@@ -2,9 +2,10 @@ import express = require("express");
 const router = express.Router();
 
 import { User } from "../models/User";
+import { passport } from "../passport";
 
 // Show list of users
-router.get("/", (req, res) => {
+router.get("/list", (req, res) => {
   User.find()
     .then(docs => {
       res.render("auth", { text: `List of users: ${docs}` });
@@ -15,12 +16,12 @@ router.get("/", (req, res) => {
 });
 
 // Show create user form
-router.get("/create", (req, res) => {
+router.get("/", (req, res) => {
   res.render("auth", { text: "Make user here" });
 });
 
 // Create a new user
-router.post("/", (req, res) => {
+router.post("/", passport.authenticate('local', { failureRedirect: "/auth" }), (req, res) => {
   res.render("auth", { text: "Your user is being created" });
 });
 

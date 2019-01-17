@@ -9,7 +9,6 @@ const session = require("express-session");
 const expressStaticGzip = require("express-static-gzip");
 const mongoose = require("mongoose");
 const passport_1 = require("./passport");
-// import { connectString } from "./main";
 // Routes import statements
 const api_1 = require("./routes/api");
 const web_1 = require("./routes/web");

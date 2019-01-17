@@ -9,12 +9,11 @@ const middleware_1 = require("./middleware");
 // Connect to mongoDB
 const { DB_HOST, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
 let connect;
-exports.connectString = connect;
 if (!DB_USER && !DB_PASSWORD) {
-    exports.connectString = connect = `mongodb://${DB_HOST}/${DB_NAME}`;
+    connect = `mongodb://${DB_HOST}/${DB_NAME}`;
 }
 else {
-    exports.connectString = connect = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+    connect = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
 }
 mongoose
     .connect(connect, {

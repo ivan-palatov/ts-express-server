@@ -15,7 +15,6 @@ if (!DB_USER && !DB_PASSWORD) {
 } else {
   connect = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
 }
-export { connect as connectString };
 mongoose
   .connect(connect, {
     useCreateIndex: true,
