@@ -39,6 +39,8 @@ passport.deserializeUser((id, done) => {
   });
 });
 
+export { passport };
+
 // Allow only authenticated users middleware
 export const authOnly = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) return next();

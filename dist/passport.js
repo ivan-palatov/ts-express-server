@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const passport = require("passport");
+exports.passport = passport;
 const passportLocal = require("passport-local");
 const User_1 = require("./models/User");
 // Config passport to use local strategy

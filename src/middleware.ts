@@ -1,12 +1,12 @@
 import bodyParser = require("body-parser");
 import compression = require("compression");
-// import connectMongo = require("connect-mongo");
+import connectMongo = require("connect-mongo");
 import express = require("express");
 // tslint:disable-next-line
-// import session = require("express-session");
+import session = require("express-session");
 import expressStaticGzip = require("express-static-gzip");
-// import mongoose = require("mongoose");
-import passport = require("passport");
+import mongoose = require("mongoose");
+import { passport } from "./passport";
 
 // import { connectString } from "./main";
 
@@ -17,8 +17,7 @@ import { webRoutes } from "./routes/web";
 const app = express();
 // Creating session store
 // tslint:disable-next-line
-// const MongoStore = connectMongo(session);
-
+const MongoStore = connectMongo(session);
 
 // Import and apply dev only middleware
 if (process.env.NODE_ENV === "development") {
@@ -40,20 +39,20 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // Session middleware
-// app.use(
-//   session({
-//     resave: false,
-//     saveUninitialized: true,
-//     secret: process.env.SESSION_SECRET,
-//     store: new MongoStore({
-//       autoReconnect: true,
-//       mongooseConnection: mongoose.connection
-//     })
-//   })
-// );
-// // Apply passport middleware
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+    store: new MongoStore({
+      autoReconnect: true,
+      mongooseConnection: mongoose.connection
+    })
+  })
+);
+// Apply passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Make server serve static pre-compressed files(if they exist) using gzip or brotli algoritms
 app.use(
