@@ -1,6 +1,13 @@
 import bcrypt = require("bcrypt");
 import * as paginate from "mongoose-paginate";
-import { plugin, pre, prop, Typegoose } from "typegoose";
+import {
+  instanceMethod,
+  InstanceType,
+  plugin,
+  pre,
+  prop,
+  Typegoose
+} from "typegoose";
 
 import { IPaginateOptions, IPaginateResult } from "../utils/interfaces";
 
@@ -9,16 +16,18 @@ enum Gender {
   FEMALE = "female"
 }
 
+type callback = (err: any, isMatch: boolean) => any;
+
 @pre<User>("save", function(next) {
-  const pw = this.password;
-  let passwordHash: string;
+  if (!this.isModified("password")) return next();
   bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(pw, salt, (error, pwHash) => {
-      passwordHash = pwHash;
+    if (err) return next();
+    bcrypt.hash(this.password, salt, (error, hash) => {
+      if (error) return next();
+      this.password = hash;
+      next();
     });
   });
-  this.password = passwordHash;
-  next();
 })
 @plugin(paginate)
 class User extends Typegoose {
@@ -42,6 +51,13 @@ class User extends Typegoose {
 
   @prop({ enum: Gender, required: true })
   gender: Gender;
+
+  @instanceMethod
+  validatePassword(this: InstanceType<User>, pw: string, done: callback): void {
+    bcrypt.compare(pw, this.password, (err, isMatch) => {
+      done(err, isMatch);
+    });
+  }
 }
 
 const userModel = new User().getModelForClass(User);

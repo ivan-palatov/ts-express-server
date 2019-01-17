@@ -18,6 +18,11 @@ var Gender;
     Gender["FEMALE"] = "female";
 })(Gender || (Gender = {}));
 let User = class User extends typegoose_1.Typegoose {
+    validatePassword(pw, done) {
+        bcrypt.compare(pw, this.password, (err, isMatch) => {
+            done(err, isMatch);
+        });
+    }
 };
 __decorate([
     typegoose_1.prop({ unique: true, index: true, required: true }),
@@ -39,17 +44,26 @@ __decorate([
     typegoose_1.prop({ enum: Gender, required: true }),
     __metadata("design:type", String)
 ], User.prototype, "gender", void 0);
+__decorate([
+    typegoose_1.instanceMethod,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Function]),
+    __metadata("design:returntype", void 0)
+], User.prototype, "validatePassword", null);
 User = __decorate([
     typegoose_1.pre("save", function (next) {
-        const pw = this.password;
-        let passwordHash;
+        if (!this.isModified("password"))
+            return next();
         bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(pw, salt, (error, pwHash) => {
-                passwordHash = pwHash;
+            if (err)
+                return next();
+            bcrypt.hash(this.password, salt, (error, hash) => {
+                if (error)
+                    return next();
+                this.password = hash;
+                next();
             });
         });
-        this.password = passwordHash;
-        next();
     }),
     typegoose_1.plugin(paginate)
 ], User);

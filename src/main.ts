@@ -9,11 +9,18 @@ import { app } from "./middleware";
 
 // Connect to mongoDB
 const { DB_HOST, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
+let connect: string;
+if (!DB_USER && !DB_PASSWORD) {
+  connect = `mongodb://${DB_HOST}/${DB_NAME}`;
+} else {
+  connect = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+}
+export { connect as connectString };
 mongoose
-  .connect(
-    `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
-    { useNewUrlParser: true }
-  )
+  .connect(connect, {
+    useCreateIndex: true,
+    useNewUrlParser: true
+  })
   .catch(err => console.log("MongoDB connect error. ", err));
 
 // View engine settings

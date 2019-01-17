@@ -8,8 +8,19 @@ dotenv.config({ path: path.join(__dirname, "../config/.env") });
 const middleware_1 = require("./middleware");
 // Connect to mongoDB
 const { DB_HOST, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
+let connect;
+exports.connectString = connect;
+if (!DB_USER && !DB_PASSWORD) {
+    exports.connectString = connect = `mongodb://${DB_HOST}/${DB_NAME}`;
+}
+else {
+    exports.connectString = connect = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+}
 mongoose
-    .connect(`mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`, { useNewUrlParser: true })
+    .connect(connect, {
+    useCreateIndex: true,
+    useNewUrlParser: true
+})
     .catch(err => console.log("MongoDB connect error. ", err));
 // View engine settings
 middleware_1.app.set("views", path.join(__dirname, "../public/views"));
