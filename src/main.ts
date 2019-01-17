@@ -1,6 +1,20 @@
+import dotenv = require("dotenv");
+import mongoose = require("mongoose");
 import path = require("path");
 
+// Parse config settings to process.env
+dotenv.config({ path: path.join(__dirname, "../config/.env") });
+
 import { app } from "./middleware";
+
+// Connect to mongoDB
+const { DB_HOST, DB_NAME, DB_USER, DB_PASSWORD } = process.env;
+mongoose
+  .connect(
+    `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`,
+    { useNewUrlParser: true }
+  )
+  .catch(err => console.log("MongoDB connect error. ", err));
 
 // View engine settings
 app.set("views", path.join(__dirname, "../public/views"));

@@ -40,7 +40,7 @@ class User extends Typegoose {
   @prop()
   age?: number;
 
-  @prop({ required: true })
+  @prop({ enum: Gender, required: true })
   gender: Gender;
 }
 

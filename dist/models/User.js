@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt = require("bcrypt");
+const paginate = require("mongoose-paginate");
 const typegoose_1 = require("typegoose");
 var Gender;
 (function (Gender) {
@@ -35,7 +36,7 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "age", void 0);
 __decorate([
-    typegoose_1.prop({ required: true }),
+    typegoose_1.prop({ enum: Gender, required: true }),
     __metadata("design:type", String)
 ], User.prototype, "gender", void 0);
 User = __decorate([
@@ -49,7 +50,8 @@ User = __decorate([
         });
         this.password = passwordHash;
         next();
-    })
+    }),
+    typegoose_1.plugin(paginate)
 ], User);
 const userModel = new User().getModelForClass(User);
 exports.User = userModel;

@@ -9,7 +9,19 @@ import { webRoutes } from "./routes/web";
 // Creating the server
 const app = express();
 
-// Apply all middleware here
+// Import and apply dev only middleware
+if (process.env.NODE_ENV === "development") {
+  // Sends full error stack traces back to the client, only for development
+  import("errorhandler").then(errorhandler => {
+    app.use(errorhandler());
+  });
+  // Request logger, could be used in production
+  import("morgan").then(morgan => {
+    app.use(morgan("dev"));
+  });
+}
+
+// Apply middleware here
 
 // Apply compression on response
 app.use(compression());
