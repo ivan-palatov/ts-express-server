@@ -1,6 +1,8 @@
 import bodyParser = require("body-parser");
 import compression = require("compression");
+import connectFlash = require("connect-flash");
 import connectMongo = require("connect-mongo");
+import cookieParser = require("cookie-parser");
 import express = require("express");
 // tslint:disable-next-line
 import session = require("express-session");
@@ -36,6 +38,7 @@ app.use(compression());
 // Parse the body into middleware before request handlers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.SESSION_SECRET));
 // Session middleware
 app.use(
   session({
@@ -48,6 +51,7 @@ app.use(
     })
   })
 );
+app.use(connectFlash());
 // Apply passport middleware
 app.use(passport.initialize());
 app.use(passport.session());

@@ -1,14 +1,14 @@
 import express = require("express");
 const router = express.Router();
 
-import { authController } from "../controllers/auth";
+import { authController } from "../controllers/authController";
 
 // All authentication routes
 router.use('/auth', authController);
 
 // Other routes
 router.get("*", (req, res) => {
-  res.render("index", { stuff: "Realy cool paragraph." });
+  res.render("index", { title: "Main page" });
 });
 
 export { router as webRoutes };

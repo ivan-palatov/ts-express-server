@@ -2,7 +2,7 @@ import express = require("express");
 const router = express.Router();
 
 import { User } from "../models/User";
-import { passport } from "../passport";
+import { passport, unauthOnly } from "../passport";
 
 // Show list of users
 router.get("/list", (req, res) => {
@@ -16,14 +16,21 @@ router.get("/list", (req, res) => {
 });
 
 // Show create user form
-router.get("/", (req, res) => {
-  res.render("auth", { text: "Make user here" });
+router.get("/", unauthOnly("/profile/me"), (req, res) => {
+  res.render("auth", { title: "Login", error: req.flash("error") });
 });
 
 // Create a new user
-router.post("/", passport.authenticate('local', { failureRedirect: "/auth" }), (req, res) => {
-  res.render("auth", { text: "Your user is being created" });
-});
+router.post(
+  "/",
+  passport.authenticate("local", {
+    failureFlash: true,
+    failureRedirect: "/auth"
+  }),
+  (req, res) => {
+    res.render("index", { text: "Your user has been created" });
+  }
+);
 
 // Show a user by id
 router.get("/:id", (req, res) => {

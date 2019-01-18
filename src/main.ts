@@ -24,7 +24,7 @@ mongoose
 
 // View engine settings
 app.set("views", path.join(__dirname, "../public/views"));
-app.set("view engine", "ejs");
+app.set("view engine", "pug");
 
 // Start server
 const PORT = process.env.PORT || 3000;

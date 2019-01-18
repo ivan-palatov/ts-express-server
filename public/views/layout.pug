@@ -1,0 +1,27 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible" content="ie=edge")
+    script(defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous")
+    link(href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet")
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" rel="stylesheet")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
+    link(href="../../static/css/main.css" rel="stylesheet")
+    title CoolSite.com - #{title}
+  body
+    nav.level
+      .level-left
+        p.level-item
+          h1.title.has-text-centered
+            a(href="/") CoolSite.com
+      .level-right
+        p.level-item.has-text-centered
+          a(href="/auth" class="button is-success is-outlined is-medium") Login
+        p.level-item.has-text-centered
+          a(href="/register" class="button is-success is-outlined is-medium") Register
+    block content
+    footer.footer
+      .content.has-text-centered
+        address Created by <a href="https://github.com/ZVER3D">ZVER3D</a>.

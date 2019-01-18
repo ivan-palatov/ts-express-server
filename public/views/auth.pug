@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  form(action="/auth" method="post")
+    .columns.is-centered
+      .column.is-two-thirds
+        h2.title.has-text-centered Login
+        if error.length > 0
+          #error-notification.notification.is-danger= error
+            #delete.delete
+        .field
+          label(for="email" class="label") E-mail
+          .control.has-icons-left
+            input(id="email" name="email" type="email" class="input" placeholder="Email input")
+            span.icon.is-small.is-left
+              i.fas.fa-envelope
+        .field
+          label(for="password" class="label") Password
+          .control.has-icons-left
+            input(id="password" name="password" type="password" class="input" placeholder="Password input")
+            span.icon.is-small.is-left
+              i.fas.fa-low-vision
+          .help.is-danger Forgot password? Click 
+            a(href="#") here
+        button.button.is-success.is-medium Login
+  script(src='../static/js/main.js')

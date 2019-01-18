@@ -23,7 +23,7 @@ mongoose
     .catch(err => console.log("MongoDB connect error. ", err));
 // View engine settings
 middleware_1.app.set("views", path.join(__dirname, "../public/views"));
-middleware_1.app.set("view engine", "ejs");
+middleware_1.app.set("view engine", "pug");
 // Start server
 const PORT = process.env.PORT || 3000;
 middleware_1.app.listen(PORT, () => {

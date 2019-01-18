@@ -7,7 +7,7 @@ const User_1 = require("./models/User");
 // Config passport to use local strategy
 // tslint:disable-next-line
 const LocalStrategy = passportLocal.Strategy;
-passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
+passport.use(new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, done) => {
     User_1.User.findOne({ email: email.toLowerCase() })
         .then(user => {
         if (!user) {
@@ -35,16 +35,16 @@ passport.deserializeUser((id, done) => {
         done(err, user);
     });
 });
-// Allow only authenticated users middleware
-exports.authOnly = (req, res, next) => {
+// Allow only authenticated users and send the rest to redirectPath
+exports.authOnly = (redirectPath) => (req, res, next) => {
     if (req.isAuthenticated())
         return next();
-    res.redirect("/login");
+    redirectPath ? res.redirect(redirectPath) : res.redirect("/login");
 };
-// Allow only unauthenticated users middleware
-exports.unauthOnly = (req, res, next) => {
-    if (!req.isUnauthenticated())
+// Allow only unauthenticated users and send the rest to redirectPath
+exports.unauthOnly = (redirectPath) => (req, res, next) => {
+    if (req.isUnauthenticated())
         return next();
-    res.redirect("back");
+    redirectPath ? res.redirect(redirectPath) : res.redirect("back");
 };
 //# sourceMappingURL=passport.js.map

@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const bodyParser = require("body-parser");
 const compression = require("compression");
+const connectFlash = require("connect-flash");
 const connectMongo = require("connect-mongo");
+const cookieParser = require("cookie-parser");
 const express = require("express");
 // tslint:disable-next-line
 const session = require("express-session");
@@ -35,6 +37,7 @@ app.use(compression());
 // Parse the body into middleware before request handlers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.SESSION_SECRET));
 // Session middleware
 app.use(session({
     resave: false,
@@ -45,6 +48,7 @@ app.use(session({
         mongooseConnection: mongoose.connection
     })
 }));
+app.use(connectFlash());
 // Apply passport middleware
 app.use(passport_1.passport.initialize());
 app.use(passport_1.passport.session());

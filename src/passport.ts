@@ -9,7 +9,7 @@ import { User } from "./models/User";
 // tslint:disable-next-line
 const LocalStrategy = passportLocal.Strategy;
 passport.use(
-  new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
+  new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, done) => {
     User.findOne({ email: email.toLowerCase() })
       .then(user => {
         if (!user) {
@@ -41,14 +41,14 @@ passport.deserializeUser((id, done) => {
 
 export { passport };
 
-// Allow only authenticated users middleware
-export const authOnly = (req: Request, res: Response, next: NextFunction) => {
+// Allow only authenticated users and send the rest to redirectPath
+export const authOnly = (redirectPath?: string) => (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) return next();
-  res.redirect("/login");
+  redirectPath ? res.redirect(redirectPath) : res.redirect("/login");
 };
 
-// Allow only unauthenticated users middleware
-export const unauthOnly = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.isUnauthenticated()) return next();
-  res.redirect("back");
+// Allow only unauthenticated users and send the rest to redirectPath
+export const unauthOnly = (redirectPath?: string) => (req: Request, res: Response, next: NextFunction) => {
+  if (req.isUnauthenticated()) return next();
+  redirectPath ? res.redirect(redirectPath) : res.redirect("back");
 };
