@@ -5,6 +5,9 @@ block content
     .columns.is-centered
       .column.is-two-thirds
         h2.title.has-text-centered Register
+        if error && error.length > 0
+          #error-notification.notification.is-danger= error
+            #delete.delete
         .field
           label(for="email" class="label") E-mail
           .control.has-icons-left
@@ -36,4 +39,6 @@ block content
         button.button.is-success.is-medium Register
   script.
     var errors = !{JSON.stringify(errors)};
+    var form = !{JSON.stringify(form)};
+    var path = "register";
   script(src='../static/js/main.js')
