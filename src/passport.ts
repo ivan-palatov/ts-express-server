@@ -15,25 +15,25 @@ passport.use(
     { usernameField: "email", passwordField: "password" },
     async (email, password, done) => {
       try {
-        const user = await User.findOne({ email: email.toLowerCase() })
-          if (!user) {
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+          return done(undefined, false, {
+            message: `User with email ${email} not found.`
+          });
+        }
+        user.validatePassword(password, (err, isMatch) => {
+          if (err) return done(err);
+          if (isMatch) {
+            if (user.isActive) return done(undefined, _.omit(user, "password"));
             return done(undefined, false, {
-              message: `User with email ${email} not found.`
+              message: "User is not active. Check your email to activate."
             });
           }
-          user.validatePassword(password, (err, isMatch) => {
-            if (err) return done(err);
-            if (isMatch) {
-              if (user.isActive) return done(undefined, _.omit(user, "password"));
-              return done(undefined, false, {
-                message: "User is not active. Check your email to activate."
-              });
-            }
-            return done(undefined, false, {
-              message: "Invalid email or password."
-            });
+          return done(undefined, false, {
+            message: "Invalid email or password."
           });
-      } catch(err) {
+        });
+      } catch (err) {
         done(err);
       }
     }

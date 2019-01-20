@@ -10,8 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt = require("bcrypt");
+const limax = require("limax");
 const paginate = require("mongoose-paginate");
+const mongooseSlugPlugin = require("mongoose-slug-plugin");
 const typegoose_1 = require("typegoose");
+// tslint:disable-next-line
+const uuidv4 = require("uuid/v4");
 var Gender;
 (function (Gender) {
     Gender["MALE"] = "male";
@@ -45,11 +49,6 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "gender", void 0);
 __decorate([
-    typegoose_1.prop({ index: true }) // TODO: add default: slug(this.name)
-    ,
-    __metadata("design:type", String)
-], User.prototype, "slug", void 0);
-__decorate([
     typegoose_1.prop(),
     __metadata("design:type", Date)
 ], User.prototype, "dateOfBirth", void 0);
@@ -58,8 +57,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
 __decorate([
-    typegoose_1.prop({}) // TODO: default: uuid/jwt
-    ,
+    typegoose_1.prop({ default: uuidv4() }),
     __metadata("design:type", String)
 ], User.prototype, "activationCode", void 0);
 __decorate([
@@ -83,7 +81,8 @@ User = __decorate([
             });
         });
     }),
-    typegoose_1.plugin(paginate)
+    typegoose_1.plugin(paginate),
+    typegoose_1.plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, histoyField: "slugHistory" })
 ], User);
 const userModel = new User().getModelForClass(User, { schemaOptions: { timestamps: true } });
 exports.User = userModel;

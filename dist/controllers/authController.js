@@ -30,9 +30,9 @@ router.post("/auth", authValidator_1.authValidator, passport_1.passport.authenti
     const errors = check_1.validationResult(req);
     if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
-        req.flash("form", JSON.stringify({ email: req.body.email }));
         return res.redirect("/register");
     }
+    req.flash("form", JSON.stringify({ email: req.body.email }));
     res.render("index", { user: req.user, title: "Main page" });
 });
 // Show register form
@@ -51,9 +51,9 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         const errors = check_1.validationResult(req);
         if (!errors.isEmpty()) {
             req.flash("errors", JSON.stringify(errors.mapped()));
-            req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
             return res.redirect("/register");
         }
+        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
         // If validation passed, proceed to register user
         const { email, name, password } = req.body;
         const user = yield new User_1.User({ email, name, password }).save();

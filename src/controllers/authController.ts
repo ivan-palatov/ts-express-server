@@ -27,9 +27,9 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       req.flash("errors", JSON.stringify(errors.mapped()));
-      req.flash("form", JSON.stringify({ email: req.body.email }));
       return res.redirect("/register");
     }
+    req.flash("form", JSON.stringify({ email: req.body.email }));
     res.render("index", { user: req.user, title: "Main page" });
   }
 );
@@ -55,9 +55,9 @@ router.post(
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
-        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
         return res.redirect("/register");
       }
+      req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
       // If validation passed, proceed to register user
       const { email, name, password } = req.body;
       const user = await new User({ email, name, password }).save();

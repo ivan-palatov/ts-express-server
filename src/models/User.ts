@@ -1,6 +1,10 @@
 import bcrypt = require("bcrypt");
+import limax = require("limax");
 import * as paginate from "mongoose-paginate";
+import mongooseSlugPlugin = require("mongoose-slug-plugin");
 import { instanceMethod, InstanceType, plugin, pre, prop, Typegoose } from "typegoose";
+// tslint:disable-next-line
+import uuidv4 = require("uuid/v4");
 
 import { IPaginateOptions, IPaginateResult } from "../utils/interfaces";
 
@@ -23,12 +27,16 @@ type callback = (err: any, isMatch: boolean) => any;
   });
 })
 @plugin(paginate)
+@plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, histoyField: "slugHistory" })
 class User extends Typegoose {
   static paginate: (
     query?: object,
     options?: IPaginateOptions,
     callback?: (err: any, result: IPaginateResult<User>) => void
   ) => Promise<IPaginateResult<User>>;
+
+  slug: string;
+  slugHistory: string[];
 
   @prop({ unique: true, index: true, required: true })
   name: string;
@@ -45,16 +53,13 @@ class User extends Typegoose {
   @prop({ enum: Gender })
   gender: Gender;
 
-  @prop({ index: true }) // TODO: add default: slug(this.name)
-  slug: string;
-
   @prop()
   dateOfBirth: Date;
 
   @prop({ default: false })
   isActive: boolean;
 
-  @prop({}) // TODO: default: uuid/jwt
+  @prop({ default: uuidv4() })
   activationCode: string;
 
   @instanceMethod
