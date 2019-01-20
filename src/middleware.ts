@@ -7,6 +7,7 @@ import express = require("express");
 // tslint:disable-next-line
 import session = require("express-session");
 import expressStaticGzip = require("express-static-gzip");
+import expressValidator = require("express-validator");
 import mongoose = require("mongoose");
 import { passport } from "./passport";
 
@@ -38,6 +39,7 @@ app.use(compression());
 // Parse the body into middleware before request handlers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(expressValidator());
 app.use(cookieParser(process.env.SESSION_SECRET));
 // Session middleware
 app.use(

@@ -5,7 +5,7 @@ block content
     .columns.is-centered
       .column.is-two-thirds
         h2.title.has-text-centered Login
-        if error.length > 0
+        if error && error.length > 0
           #error-notification.notification.is-danger= error
             #delete.delete
         .field

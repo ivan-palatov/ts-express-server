@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  form(action="/register" method="post")
+    .columns.is-centered
+      .column.is-two-thirds
+        h2.title.has-text-centered Register
+        .field
+          label(for="email" class="label") E-mail
+          .control.has-icons-left
+            input(id="email" name="email" type="email" class="input" placeholder="Email input")
+            span.icon.is-small.is-left
+              i.fas.fa-envelope
+            .help.is-success You will recive message on this email shortly after registration to confirm its yours.
+        .field
+          label(for="name" class="label") Nickname
+          .control.has-icons-left
+            input(id="name" name="name" type="text" class="input" placeholder="Name input")
+            span.icon.is-small.is-left
+              i.fas.fa-user
+            .help.is-success Should be unique.
+        .field
+          label(for="password" class="label") Password
+          .control.has-icons-left
+            input(id="password" name="password" type="password" class="input" placeholder="Password input")
+            span.icon.is-small.is-left
+              i.fas.fa-low-vision
+            .help.is-success Should be at least 8 characters long and contain at least one letter and number.
+        .field
+          label(for="password2" class="label") Confirm password
+          .control.has-icons-left
+            input(id="password2" name="password2" type="password" class="input" placeholder="Confirm password input")
+            span.icon.is-small.is-left
+              i.fas.fa-low-vision
+            .help.is-success Passwords must match.
+        button.button.is-success.is-medium Register
+  script.
+    var errors = !{JSON.stringify(errors)};
+  script(src='../static/js/main.js')

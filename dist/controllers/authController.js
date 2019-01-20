@@ -3,43 +3,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const router = express.Router();
 exports.authController = router;
-const User_1 = require("../models/User");
+const check_1 = require("express-validator/check");
 const passport_1 = require("../passport");
-// Show list of users
-router.get("/list", (req, res) => {
-    User_1.User.find()
-        .then(docs => {
-        res.render("auth", { text: `List of users: ${docs}` });
-    })
-        .catch(err => {
-        res.render("auth", { text: `Something went wrong. ${err}` });
-    });
-});
-// Show create user form
-router.get("/", passport_1.unauthOnly("/profile/me"), (req, res) => {
+const authValidator_1 = require("../validators/authValidator");
+// Show auth form
+router.get("/auth", passport_1.unauthOnly("/profile/me"), (req, res) => {
     res.render("auth", { title: "Login", error: req.flash("error") });
 });
-// Create a new user
-router.post("/", passport_1.passport.authenticate("local", {
-    failureFlash: true,
-    failureRedirect: "/auth"
-}), (req, res) => {
-    res.render("index", { text: "Your user has been created" });
+// Handle auth request
+router.post("/auth", passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
+    res.render("index", { user: req.user });
 });
-// Show a user by id
-router.get("/:id", (req, res) => {
-    res.render("auth", { text: `User ${req.params.id} is being shown.` });
+// Show register form
+router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {
+    let errors = req.flash("errors")[0];
+    errors = errors ? JSON.parse(errors) : null;
+    res.render("register", { errors, title: "Register" });
 });
-// Show edit form for user
-router.get("/:id/edit", (req, res) => {
-    res.render("auth", { text: `Edit page for ${req.params.id} user.` });
-});
-// Edit user by id
-router.patch("/:id", (req, res) => {
-    res.render("auth", { text: `User ${req.params.id} is being updated.` });
-});
-// Delete user by id
-router.delete("/:id", (req, res) => {
-    res.render("auth", { text: `You deleted ${req.params.id} user.` });
+// Handle register request
+router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnly("/profile/me"), (req, res) => {
+    const errors = check_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        req.flash("errors", JSON.stringify(errors.mapped()));
+        return res.redirect("/register");
+    }
+    // TODO: password confirmation
+    // const { email, name, password } = req.body;
+    // const user = new User({ email, name, password });
+    // user
+    //   .save()
+    //   .then(newUser => {
+    //     req.login(newUser, err => {
+    //       if (err) return res.redirect(500, "/");
+    //       res.redirect("profile/me");
+    //     });
+    //   })
+    //   .catch(err => {
+    //     req.flash("error", err);
+    //     res.redirect("back");
+    //   });
 });
 //# sourceMappingURL=authController.js.map

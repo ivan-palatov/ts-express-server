@@ -1,55 +1,51 @@
 import express = require("express");
 const router = express.Router();
+import { NextFunction, Request, Response } from "express";
 
+import { validationResult } from "express-validator/check";
 import { User } from "../models/User";
 import { passport, unauthOnly } from "../passport";
+import { registerValidator } from "../validators/authValidator";
 
-// Show list of users
-router.get("/list", (req, res) => {
-  User.find()
-    .then(docs => {
-      res.render("auth", { text: `List of users: ${docs}` });
-    })
-    .catch(err => {
-      res.render("auth", { text: `Something went wrong. ${err}` });
-    });
-});
-
-// Show create user form
-router.get("/", unauthOnly("/profile/me"), (req, res) => {
+// Show auth form
+router.get("/auth", unauthOnly("/profile/me"), (req, res) => {
   res.render("auth", { title: "Login", error: req.flash("error") });
 });
 
-// Create a new user
-router.post(
-  "/",
-  passport.authenticate("local", {
-    failureFlash: true,
-    failureRedirect: "/auth"
-  }),
-  (req, res) => {
-    res.render("index", { text: "Your user has been created" });
+// Handle auth request
+router.post("/auth", passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
+  res.render("index", { user: req.user });
+});
+
+// Show register form
+router.get("/register", unauthOnly("/profile/me"), (req, res) => {
+  let errors = req.flash("errors")[0];
+  errors = errors ? JSON.parse(errors) : null;
+  res.render("register", { errors, title: "Register" });
+});
+
+// Handle register request
+router.post("/register", registerValidator, unauthOnly("/profile/me"), (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash("errors", JSON.stringify(errors.mapped()));
+    return res.redirect("/register");
   }
-);
-
-// Show a user by id
-router.get("/:id", (req, res) => {
-  res.render("auth", { text: `User ${req.params.id} is being shown.` });
-});
-
-// Show edit form for user
-router.get("/:id/edit", (req, res) => {
-  res.render("auth", { text: `Edit page for ${req.params.id} user.` });
-});
-
-// Edit user by id
-router.patch("/:id", (req, res) => {
-  res.render("auth", { text: `User ${req.params.id} is being updated.` });
-});
-
-// Delete user by id
-router.delete("/:id", (req, res) => {
-  res.render("auth", { text: `You deleted ${req.params.id} user.` });
+  // TODO: password confirmation
+  // const { email, name, password } = req.body;
+  // const user = new User({ email, name, password });
+  // user
+  //   .save()
+  //   .then(newUser => {
+  //     req.login(newUser, err => {
+  //       if (err) return res.redirect(500, "/");
+  //       res.redirect("profile/me");
+  //     });
+  //   })
+  //   .catch(err => {
+  //     req.flash("error", err);
+  //     res.redirect("back");
+  //   });
 });
 
 export { router as authController };

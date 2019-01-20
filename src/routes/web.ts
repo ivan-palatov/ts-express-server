@@ -4,7 +4,7 @@ const router = express.Router();
 import { authController } from "../controllers/authController";
 
 // All authentication routes
-router.use('/auth', authController);
+router.use('/', authController);
 
 // Other routes
 router.get("*", (req, res) => {

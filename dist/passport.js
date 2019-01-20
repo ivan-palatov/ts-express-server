@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable-next-line
+const _ = require("lodash");
 const passport = require("passport");
 exports.passport = passport;
 const passportLocal = require("passport-local");
@@ -19,7 +21,7 @@ passport.use(new LocalStrategy({ usernameField: "email", passwordField: "passwor
             if (err)
                 return done(err);
             if (isMatch)
-                return done(undefined, user);
+                return done(undefined, _.omit(user, "password"));
             return done(undefined, false, {
                 message: "Invalid email or password."
             });
@@ -39,12 +41,12 @@ passport.deserializeUser((id, done) => {
 exports.authOnly = (redirectPath) => (req, res, next) => {
     if (req.isAuthenticated())
         return next();
-    redirectPath ? res.redirect(redirectPath) : res.redirect("/login");
+    res.redirect(redirectPath);
 };
 // Allow only unauthenticated users and send the rest to redirectPath
 exports.unauthOnly = (redirectPath) => (req, res, next) => {
     if (req.isUnauthenticated())
         return next();
-    redirectPath ? res.redirect(redirectPath) : res.redirect("back");
+    res.redirect(redirectPath);
 };
 //# sourceMappingURL=passport.js.map

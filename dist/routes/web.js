@@ -5,7 +5,7 @@ const router = express.Router();
 exports.webRoutes = router;
 const authController_1 = require("../controllers/authController");
 // All authentication routes
-router.use('/auth', authController_1.authController);
+router.use('/', authController_1.authController);
 // Other routes
 router.get("*", (req, res) => {
     res.render("index", { title: "Main page" });

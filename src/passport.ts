@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from "express";
+// tslint:disable-next-line
+import _ = require("lodash");
 import passport = require("passport");
 import passportLocal = require("passport-local");
 
@@ -19,7 +21,7 @@ passport.use(
         }
         user.validatePassword(password, (err, isMatch) => {
           if (err) return done(err);
-          if (isMatch) return done(undefined, user);
+          if (isMatch) return done(undefined, _.omit(user, "password"));
           return done(undefined, false, {
             message: "Invalid email or password."
           });
@@ -42,13 +44,13 @@ passport.deserializeUser((id, done) => {
 export { passport };
 
 // Allow only authenticated users and send the rest to redirectPath
-export const authOnly = (redirectPath?: string) => (req: Request, res: Response, next: NextFunction) => {
+export const authOnly = (redirectPath: string) => (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) return next();
-  redirectPath ? res.redirect(redirectPath) : res.redirect("/login");
+  res.redirect(redirectPath);
 };
 
 // Allow only unauthenticated users and send the rest to redirectPath
-export const unauthOnly = (redirectPath?: string) => (req: Request, res: Response, next: NextFunction) => {
+export const unauthOnly = (redirectPath: string) => (req: Request, res: Response, next: NextFunction) => {
   if (req.isUnauthenticated()) return next();
-  redirectPath ? res.redirect(redirectPath) : res.redirect("back");
+  res.redirect(redirectPath);
 };
