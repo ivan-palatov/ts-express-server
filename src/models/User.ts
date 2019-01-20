@@ -27,7 +27,7 @@ type callback = (err: any, isMatch: boolean) => any;
   });
 })
 @plugin(paginate)
-@plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, histoyField: "slugHistory" })
+@plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, historyField: "slugHistory" })
 class User extends Typegoose {
   static paginate: (
     query?: object,
