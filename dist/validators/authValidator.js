@@ -8,7 +8,13 @@ exports.registerValidator = [
         .isEmail()
         .withMessage("Invalid email address.")
         .trim()
-        .normalizeEmail(),
+        .normalizeEmail({
+        gmail_convert_googlemaildotcom: true,
+        gmail_lowercase: true,
+        icloud_lowercase: true,
+        outlookdotcom_lowercase: true,
+        yahoo_lowercase: true
+    }),
     check_1.body("name")
         .exists()
         .withMessage("Name field is required.")
@@ -22,6 +28,8 @@ exports.registerValidator = [
     check_1.body("password")
         .exists()
         .withMessage("Password field is required.")
+        .isString()
+        .withMessage("Password should be a string.")
         .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!$%@#£€*?&]{8,}$/)
         .withMessage("Password should be at least 8 symbols long, contain at least one number and one letter."),
     check_1.body("password2")
@@ -35,5 +43,25 @@ exports.registerValidator = [
             return value;
         }
     })
+];
+exports.authValidator = [
+    check_1.body("email")
+        .exists()
+        .withMessage("Email field is required.")
+        .isEmail()
+        .withMessage("Invalid email.")
+        .trim()
+        .normalizeEmail({
+        gmail_convert_googlemaildotcom: true,
+        gmail_lowercase: true,
+        icloud_lowercase: true,
+        outlookdotcom_lowercase: true,
+        yahoo_lowercase: true
+    }),
+    check_1.body("password")
+        .exists()
+        .withMessage("Password field is required.")
+        .isString()
+        .withMessage("Password should be a string")
 ];
 //# sourceMappingURL=authValidator.js.map

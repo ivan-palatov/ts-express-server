@@ -1,13 +1,6 @@
 import bcrypt = require("bcrypt");
 import * as paginate from "mongoose-paginate";
-import {
-  instanceMethod,
-  InstanceType,
-  plugin,
-  pre,
-  prop,
-  Typegoose
-} from "typegoose";
+import { instanceMethod, InstanceType, plugin, pre, prop, Typegoose } from "typegoose";
 
 import { IPaginateOptions, IPaginateResult } from "../utils/interfaces";
 
@@ -52,6 +45,18 @@ class User extends Typegoose {
   @prop({ enum: Gender, required: true })
   gender: Gender;
 
+  @prop({ index: true }) // TODO: add default: slug(this.name)
+  slug: string;
+
+  @prop()
+  dateOfBirth: Date;
+
+  @prop({ default: false })
+  isActive: boolean;
+
+  @prop({}) // TODO: default: uuid/jwt
+  activationCode: string;
+
   @instanceMethod
   validatePassword(this: InstanceType<User>, pw: string, done: callback): void {
     bcrypt.compare(pw, this.password, (err, isMatch) => {
@@ -60,5 +65,5 @@ class User extends Typegoose {
   }
 }
 
-const userModel = new User().getModelForClass(User);
+const userModel = new User().getModelForClass(User, { schemaOptions: { timestamps: true } });
 export { userModel as User };

@@ -45,6 +45,24 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "gender", void 0);
 __decorate([
+    typegoose_1.prop({ index: true }) // TODO: add default: slug(this.name)
+    ,
+    __metadata("design:type", String)
+], User.prototype, "slug", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", Date)
+], User.prototype, "dateOfBirth", void 0);
+__decorate([
+    typegoose_1.prop({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+__decorate([
+    typegoose_1.prop({}) // TODO: default: uuid/jwt
+    ,
+    __metadata("design:type", String)
+], User.prototype, "activationCode", void 0);
+__decorate([
     typegoose_1.instanceMethod,
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Function]),
@@ -67,6 +85,6 @@ User = __decorate([
     }),
     typegoose_1.plugin(paginate)
 ], User);
-const userModel = new User().getModelForClass(User);
+const userModel = new User().getModelForClass(User, { schemaOptions: { timestamps: true } });
 exports.User = userModel;
 //# sourceMappingURL=User.js.map

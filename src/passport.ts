@@ -21,6 +21,7 @@ passport.use(
         }
         user.validatePassword(password, (err, isMatch) => {
           if (err) return done(err);
+          // TODO: isActive check
           if (isMatch) return done(undefined, _.omit(user, "password"));
           return done(undefined, false, {
             message: "Invalid email or password."

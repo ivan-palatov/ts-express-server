@@ -9,11 +9,23 @@ const passport_1 = require("../passport");
 const authValidator_1 = require("../validators/authValidator");
 // Show auth form
 router.get("/auth", passport_1.unauthOnly("/profile/me"), (req, res) => {
-    res.render("auth", { title: "Login", error: req.flash("error") });
+    // If errors, parse them
+    let errors = req.flash("errors")[0];
+    errors = errors ? JSON.parse(errors) : null;
+    // If form was send before, parse the params back
+    let form = req.flash("form")[0];
+    form = form ? JSON.parse(form) : null;
+    res.render("auth", { errors, form, title: "Login", error: req.flash("error") });
 });
 // Handle auth request
-router.post("/auth", passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
-    res.render("index", { user: req.user });
+router.post("/auth", authValidator_1.authValidator, passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
+    const errors = check_1.validationResult(req);
+    if (!errors.isEmpty()) {
+        req.flash("errors", JSON.stringify(errors.mapped()));
+        req.flash("form", JSON.stringify({ email: req.body.email }));
+        return res.redirect("/register");
+    }
+    res.render("index", { user: req.user, title: "Main page" });
 });
 // Show register form
 router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {

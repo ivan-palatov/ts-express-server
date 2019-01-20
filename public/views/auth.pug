@@ -23,4 +23,8 @@ block content
           .help.is-danger Forgot password? Click 
             a(href="#") here
         button.button.is-success.is-medium Login
+  script.
+    var errors = !{JSON.stringify(errors)};
+    var form = !{JSON.stringify(form)};
+    var path = "auth";
   script(src='../static/js/main.js')

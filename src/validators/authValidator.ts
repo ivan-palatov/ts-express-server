@@ -7,7 +7,13 @@ export const registerValidator = [
     .isEmail()
     .withMessage("Invalid email address.")
     .trim()
-    .normalizeEmail(),
+    .normalizeEmail({
+      gmail_convert_googlemaildotcom: true,
+      gmail_lowercase: true,
+      icloud_lowercase: true,
+      outlookdotcom_lowercase: true,
+      yahoo_lowercase: true
+    }),
   body("name")
     .exists()
     .withMessage("Name field is required.")
@@ -21,6 +27,8 @@ export const registerValidator = [
   body("password")
     .exists()
     .withMessage("Password field is required.")
+    .isString()
+    .withMessage("Password should be a string.")
     .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!$%@#£€*?&]{8,}$/)
     .withMessage(
       "Password should be at least 8 symbols long, contain at least one number and one letter."
@@ -35,4 +43,25 @@ export const registerValidator = [
         return value;
       }
     })
+];
+
+export const authValidator = [
+  body("email")
+    .exists()
+    .withMessage("Email field is required.")
+    .isEmail()
+    .withMessage("Invalid email.")
+    .trim()
+    .normalizeEmail({
+      gmail_convert_googlemaildotcom: true,
+      gmail_lowercase: true,
+      icloud_lowercase: true,
+      outlookdotcom_lowercase: true,
+      yahoo_lowercase: true
+    }),
+  body("password")
+    .exists()
+    .withMessage("Password field is required.")
+    .isString()
+    .withMessage("Password should be a string")
 ];
