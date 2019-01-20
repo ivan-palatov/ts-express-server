@@ -50,30 +50,28 @@ router.post(
   "/register",
   registerValidator,
   unauthOnly("/profile/me"),
-  (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      req.flash("errors", JSON.stringify(errors.mapped()));
-      req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
-      return res.redirect("/register");
-    }
-    // If validation passed, proceed to register user
-    const { email, name, password } = req.body;
-    const user = new User({ email, name, password });
-    user
-      .save()
-      .then(newUser => {
-        req.login(newUser, err => {
-          if (err) return res.redirect(500, "/");
-          res.redirect("profile/me");
-        });
-      })
-      .catch(err => {
-        // TODO: if user email/name already exists?
-        // see what errors and in what format mongoose passes
-        req.flash("error", "Something went wrong, please try again later.");
-        res.redirect("back");
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        req.flash("errors", JSON.stringify(errors.mapped()));
+        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
+        return res.redirect("/register");
+      }
+      // If validation passed, proceed to register user
+      const { email, name, password } = req.body;
+      const user = await new User({ email, name, password }).save();
+      req.login(user, err => {
+        if (err) return res.redirect("/auth");
+        res.render("index", { user, title: "Main page" });
       });
+    } catch (errors) {
+      // TODO: if user email/name already exists?
+      // see what errors and in what format mongoose passes
+      console.log(errors);
+      req.flash("error", "Something went wrong, please try again later.");
+      res.redirect("back");
+    }
   }
 );
 

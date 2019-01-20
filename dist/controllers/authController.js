@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const router = express.Router();
@@ -38,30 +46,29 @@ router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {
     res.render("register", { errors, form, error: req.flash("error"), title: "Register" });
 });
 // Handle register request
-router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnly("/profile/me"), (req, res) => {
-    const errors = check_1.validationResult(req);
-    if (!errors.isEmpty()) {
-        req.flash("errors", JSON.stringify(errors.mapped()));
-        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
-        return res.redirect("/register");
-    }
-    // If validation passed, proceed to register user
-    const { email, name, password } = req.body;
-    const user = new User_1.User({ email, name, password });
-    user
-        .save()
-        .then(newUser => {
-        req.login(newUser, err => {
+router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const errors = check_1.validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash("errors", JSON.stringify(errors.mapped()));
+            req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
+            return res.redirect("/register");
+        }
+        // If validation passed, proceed to register user
+        const { email, name, password } = req.body;
+        const user = yield new User_1.User({ email, name, password }).save();
+        req.login(user, err => {
             if (err)
-                return res.redirect(500, "/");
-            res.redirect("profile/me");
+                return res.redirect("/auth");
+            res.render("index", { user, title: "Main page" });
         });
-    })
-        .catch(err => {
+    }
+    catch (errors) {
         // TODO: if user email/name already exists?
         // see what errors and in what format mongoose passes
+        console.log(errors);
         req.flash("error", "Something went wrong, please try again later.");
         res.redirect("back");
-    });
-});
+    }
+}));
 //# sourceMappingURL=authController.js.map

@@ -11,25 +11,33 @@ import { User } from "./models/User";
 // tslint:disable-next-line
 const LocalStrategy = passportLocal.Strategy;
 passport.use(
-  new LocalStrategy({ usernameField: "email", passwordField: "password" }, (email, password, done) => {
-    User.findOne({ email: email.toLowerCase() })
-      .then(user => {
-        if (!user) {
-          return done(undefined, false, {
-            message: `User with email ${email} not found.`
+  new LocalStrategy(
+    { usernameField: "email", passwordField: "password" },
+    async (email, password, done) => {
+      try {
+        const user = await User.findOne({ email: email.toLowerCase() })
+          if (!user) {
+            return done(undefined, false, {
+              message: `User with email ${email} not found.`
+            });
+          }
+          user.validatePassword(password, (err, isMatch) => {
+            if (err) return done(err);
+            if (isMatch) {
+              if (user.isActive) return done(undefined, _.omit(user, "password"));
+              return done(undefined, false, {
+                message: "User is not active. Check your email to activate."
+              });
+            }
+            return done(undefined, false, {
+              message: "Invalid email or password."
+            });
           });
-        }
-        user.validatePassword(password, (err, isMatch) => {
-          if (err) return done(err);
-          // TODO: isActive check
-          if (isMatch) return done(undefined, _.omit(user, "password"));
-          return done(undefined, false, {
-            message: "Invalid email or password."
-          });
-        });
-      })
-      .catch(err => done(err));
-  })
+      } catch(err) {
+        done(err);
+      }
+    }
+  )
 );
 
 passport.serializeUser<any, any>((user, done) => {
@@ -45,13 +53,21 @@ passport.deserializeUser((id, done) => {
 export { passport };
 
 // Allow only authenticated users and send the rest to redirectPath
-export const authOnly = (redirectPath: string) => (req: Request, res: Response, next: NextFunction) => {
+export const authOnly = (redirectPath: string) => (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (req.isAuthenticated()) return next();
   res.redirect(redirectPath);
 };
 
 // Allow only unauthenticated users and send the rest to redirectPath
-export const unauthOnly = (redirectPath: string) => (req: Request, res: Response, next: NextFunction) => {
+export const unauthOnly = (redirectPath: string) => (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (req.isUnauthenticated()) return next();
   res.redirect(redirectPath);
 };

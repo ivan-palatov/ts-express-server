@@ -41,7 +41,7 @@ __decorate([
     __metadata("design:type", Number)
 ], User.prototype, "age", void 0);
 __decorate([
-    typegoose_1.prop({ enum: Gender, required: true }),
+    typegoose_1.prop({ enum: Gender }),
     __metadata("design:type", String)
 ], User.prototype, "gender", void 0);
 __decorate([

@@ -42,7 +42,7 @@ class User extends Typegoose {
   @prop()
   age?: number;
 
-  @prop({ enum: Gender, required: true })
+  @prop({ enum: Gender })
   gender: Gender;
 
   @prop({ index: true }) // TODO: add default: slug(this.name)
