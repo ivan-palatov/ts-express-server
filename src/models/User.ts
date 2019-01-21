@@ -2,7 +2,16 @@ import bcrypt = require("bcrypt");
 import limax = require("limax");
 import * as paginate from "mongoose-paginate";
 import mongooseSlugPlugin = require("mongoose-slug-plugin");
-import { instanceMethod, InstanceType, plugin, pre, prop, Typegoose } from "typegoose";
+import {
+  instanceMethod,
+  InstanceType,
+  ModelType,
+  plugin,
+  pre,
+  prop,
+  staticMethod,
+  Typegoose
+} from "typegoose";
 // tslint:disable-next-line
 import uuidv4 = require("uuid/v4");
 
@@ -37,6 +46,11 @@ class User extends Typegoose {
     options?: IPaginateOptions,
     callback?: (err: any, result: IPaginateResult<User>) => void
   ) => Promise<IPaginateResult<User>>;
+
+  @staticMethod
+  static getBySlug(this: ModelType<User>, slug: string) {
+    return this.findOne({ slug });
+  }
 
   slug: string;
   slugHistory: string[];
