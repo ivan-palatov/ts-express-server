@@ -12,6 +12,7 @@ const express = require("express");
 const router = express.Router();
 exports.authController = router;
 const check_1 = require("express-validator/check");
+const passwordGenerator = require("password-generator");
 const User_1 = require("../models/User");
 const nodemailer_1 = require("../nodemailer");
 const confirmEmail_1 = require("../notifications/confirmEmail");
@@ -93,6 +94,31 @@ router.get("/activate/:code", (req, res) => __awaiter(this, void 0, void 0, func
     catch (errors) {
         req.flash("error", "Can't find a user with that activation code.");
         res.redirect("/auth");
+    }
+}));
+// Reset password form
+router.get("/reset-password", (req, res) => {
+    res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+});
+// Handle reset password request
+router.post("/reset-password", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.User.findOne({ email: req.body.email });
+        if (!user) {
+            req.flash("error", "User with that email doesn't exist.");
+            return res.redirect("/reset-password");
+        }
+        const password = passwordGenerator(Math.floor(Math.random() * 5 + 8), false);
+        user.password = password;
+        // TODO: send mail
+        yield user.save();
+        req.flash("info", "We send a new password to your email.");
+        res.redirect("/login");
+    }
+    catch (errors) {
+        // TODO: actual error messages maybe?
+        req.flash("error", "Something went wrong");
+        res.redirect("/reset-password");
     }
 }));
 //# sourceMappingURL=authController.js.map

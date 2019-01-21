@@ -5,12 +5,6 @@ block content
     .columns.is-centered
       .column.is-two-thirds
         h2.title.has-text-centered Register
-        if error && error.length > 0
-          .notification.is-danger= error
-            .delete
-        if info && info.length > 0
-          .notification.is-danger= info
-            .delete
         .field
           label(for="email" class="label") E-mail
           .control.has-icons-left

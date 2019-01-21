@@ -30,6 +30,9 @@ var Gender;
     Gender["FEMALE"] = "female";
 })(Gender || (Gender = {}));
 let User = class User extends typegoose_1.Typegoose {
+    static getBySlug(slug) {
+        return this.findOne({ slug });
+    }
     validatePassword(pw) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -75,6 +78,12 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], User.prototype, "validatePassword", null);
+__decorate([
+    typegoose_1.staticMethod,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], User, "getBySlug", null);
 User = __decorate([
     typegoose_1.pre("save", function (next) {
         return __awaiter(this, void 0, void 0, function* () {

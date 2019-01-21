@@ -11,7 +11,7 @@ html(lang="en")
     link(href="../../static/css/main.css" rel="stylesheet")
     title CoolSite.com - #{title}
   body
-    nav.level
+    nav.level.is-mobile
       .level-left
         p.level-item
           h1.title.has-text-centered
@@ -21,6 +21,14 @@ html(lang="en")
           a(href="/auth" class="button is-success is-outlined is-medium") Login
         p.level-item.has-text-centered
           a(href="/register" class="button is-success is-outlined is-medium") Register
+    .columns.is-centered
+      .column.is-two-thirds
+        if error && error.length > 0
+          .notification.is-centered.is-danger= error
+            .delete
+        if info && info.length > 0
+          .notification.is-centered.is-danger= info
+            .delete
     block content
     footer.footer
       .content.has-text-centered
