@@ -25,7 +25,12 @@ enum Gender {
   }
 })
 @plugin(paginate)
-@plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, historyField: "slugHistory" })
+@plugin(mongooseSlugPlugin, {
+  tmpl: "<%=name%>",
+  slug: limax,
+  slugOptions: { separateNumbers: false },
+  historyField: "slugHistory"
+})
 class User extends Typegoose {
   static paginate: (
     query?: object,
@@ -64,7 +69,6 @@ class User extends Typegoose {
     } catch (error) {
       throw new Error(error);
     }
-    
   }
 }
 

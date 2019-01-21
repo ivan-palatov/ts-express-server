@@ -92,7 +92,12 @@ User = __decorate([
         });
     }),
     typegoose_1.plugin(paginate),
-    typegoose_1.plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, historyField: "slugHistory" })
+    typegoose_1.plugin(mongooseSlugPlugin, {
+        tmpl: "<%=name%>",
+        slug: limax,
+        slugOptions: { separateNumbers: false },
+        historyField: "slugHistory"
+    })
 ], User);
 const userModel = new User().getModelForClass(User, { schemaOptions: { timestamps: true } });
 exports.User = userModel;
