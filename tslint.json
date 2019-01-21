@@ -11,6 +11,7 @@
     "no-default-export": true,
     "member-access": false,
     "only-arrow-functions": false,
-    "ter-prefer-arrow-callback": false
+    "ter-prefer-arrow-callback": false,
+    "object-literal-sort-keys": false
   }
 }

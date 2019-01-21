@@ -13,6 +13,8 @@ const router = express.Router();
 exports.authController = router;
 const check_1 = require("express-validator/check");
 const User_1 = require("../models/User");
+const nodemailer_1 = require("../nodemailer");
+const confirmEmail_1 = require("../notifications/confirmEmail");
 const passport_1 = require("../passport");
 const authValidator_1 = require("../validators/authValidator");
 // Show auth form
@@ -57,7 +59,7 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         // If validation passed, proceed to register user
         const { email, name, password } = req.body;
         const user = yield new User_1.User({ email, name, password }).save();
-        // Send email to the user
+        yield nodemailer_1.transporter.sendMail(confirmEmail_1.mailOptions(user.email, user.activationCode, "http://localhost:3000"));
         req.flash("info", "You have successfuly registered, please confirm your email to continue.");
         res.redirect("/");
     }

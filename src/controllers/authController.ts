@@ -1,9 +1,11 @@
 import express = require("express");
 const router = express.Router();
-import { NextFunction, Request, Response } from "express";
-
+import { Request, Response } from "express";
 import { validationResult } from "express-validator/check";
+
 import { User } from "../models/User";
+import { transporter } from "../nodemailer";
+import { mailOptions } from "../notifications/confirmEmail";
 import { passport, unauthOnly } from "../passport";
 import { authValidator, registerValidator } from "../validators/authValidator";
 
@@ -52,6 +54,7 @@ router.post(
   unauthOnly("/profile/me"),
   async (req: Request, res: Response) => {
     try {
+      // Check for validation errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
@@ -61,7 +64,9 @@ router.post(
       // If validation passed, proceed to register user
       const { email, name, password } = req.body;
       const user = await new User({ email, name, password }).save();
-      // Send email to the user
+      // Send activation email
+      await transporter.sendMail(mailOptions(user.email, user.activationCode, "http://localhost:3000"));
+      // Show info message and redirect to main page
       req.flash("info", "You have successfuly registered, please confirm your email to continue.");
       res.redirect("/");
     } catch (errors) {
