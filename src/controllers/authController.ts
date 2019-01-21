@@ -17,7 +17,13 @@ router.get("/auth", unauthOnly("/profile/me"), (req, res) => {
   // If form was send before, parse the params back
   let form = req.flash("form")[0];
   form = form ? JSON.parse(form) : null;
-  res.render("auth", { errors, form, title: "Login", error: req.flash("error") });
+  res.render("auth", {
+    errors,
+    form,
+    title: "Login",
+    error: req.flash("error"),
+    info: req.flash("info")
+  });
 });
 
 // Handle auth request
@@ -65,7 +71,9 @@ router.post(
       const { email, name, password } = req.body;
       const user = await new User({ email, name, password }).save();
       // Send activation email
-      await transporter.sendMail(mailOptions(user.email, user.activationCode, "http://localhost:3000"));
+      await transporter.sendMail(
+        mailOptions(user.email, user.activationCode, "http://localhost:3000")
+      );
       // Show info message and redirect to main page
       req.flash("info", "You have successfuly registered, please confirm your email to continue.");
       res.redirect("/");
@@ -78,5 +86,20 @@ router.post(
     }
   }
 );
+
+// Activate user via activation code
+router.get("/activate/:code", async (req, res) => {
+  try {
+    const user = await User.findOne({ activationCode: req.params.code });
+    user.activationCode = "";
+    user.isActive = true;
+    user.save();
+    req.flash("info", "Successfuly activated!");
+    res.redirect("/auth");
+  } catch (errors) {
+    req.flash("error", "Can't find a user with that activation code.");
+    res.redirect("/auth");
+  }
+});
 
 export { router as authController };

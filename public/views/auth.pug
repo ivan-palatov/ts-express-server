@@ -6,8 +6,11 @@ block content
       .column.is-two-thirds
         h2.title.has-text-centered Login
         if error && error.length > 0
-          #error-notification.notification.is-danger= error
-            #delete.delete
+          .notification.is-danger= error
+            .delete
+        if info && info.length > 0
+          .notification.is-danger= info
+            .delete
         .field
           label(for="email" class="label") E-mail
           .control.has-icons-left

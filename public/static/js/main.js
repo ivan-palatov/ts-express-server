@@ -1,6 +1,6 @@
 // Handle close button click on auth error notification
-$("#delete").on("click", function() {
-  $("#error-notification").hide(500, "linear");
+$(".delete").on("click", function() {
+  $(".notification").hide(500, "linear");
 });
 
 // Set values to what they were before the request

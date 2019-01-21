@@ -25,7 +25,13 @@ router.get("/auth", passport_1.unauthOnly("/profile/me"), (req, res) => {
     // If form was send before, parse the params back
     let form = req.flash("form")[0];
     form = form ? JSON.parse(form) : null;
-    res.render("auth", { errors, form, title: "Login", error: req.flash("error") });
+    res.render("auth", {
+        errors,
+        form,
+        title: "Login",
+        error: req.flash("error"),
+        info: req.flash("info")
+    });
 });
 // Handle auth request
 router.post("/auth", authValidator_1.authValidator, passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
@@ -50,6 +56,7 @@ router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {
 // Handle register request
 router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
+        // Check for validation errors
         const errors = check_1.validationResult(req);
         if (!errors.isEmpty()) {
             req.flash("errors", JSON.stringify(errors.mapped()));
@@ -59,7 +66,9 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         // If validation passed, proceed to register user
         const { email, name, password } = req.body;
         const user = yield new User_1.User({ email, name, password }).save();
+        // Send activation email
         yield nodemailer_1.transporter.sendMail(confirmEmail_1.mailOptions(user.email, user.activationCode, "http://localhost:3000"));
+        // Show info message and redirect to main page
         req.flash("info", "You have successfuly registered, please confirm your email to continue.");
         res.redirect("/");
     }
@@ -69,6 +78,21 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         console.log(errors);
         req.flash("error", "Something went wrong, please try again later.");
         res.redirect("back");
+    }
+}));
+// Activate user via activation code
+router.get("/activate/:code", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    try {
+        const user = yield User_1.User.findOne({ activationCode: req.params.code });
+        user.activationCode = "";
+        user.isActive = true;
+        user.save();
+        req.flash("info", "Successfuly activated!");
+        res.redirect("/auth");
+    }
+    catch (errors) {
+        req.flash("error", "Can't find a user with that activation code.");
+        res.redirect("/auth");
     }
 }));
 //# sourceMappingURL=authController.js.map

@@ -13,8 +13,6 @@ enum Gender {
   FEMALE = "female"
 }
 
-type callback = (err: any, isMatch: boolean) => any;
-
 @pre<User>("save", async function(next) {
   if (!this.isModified("password")) return next();
   try {
