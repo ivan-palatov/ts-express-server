@@ -57,11 +57,9 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         // If validation passed, proceed to register user
         const { email, name, password } = req.body;
         const user = yield new User_1.User({ email, name, password }).save();
-        req.login(user, err => {
-            if (err)
-                return res.redirect("/auth");
-            res.render("index", { user, title: "Main page" });
-        });
+        // Send email to the user
+        req.flash("info", "You have successfuly registered, please confirm your email to continue.");
+        res.redirect("/");
     }
     catch (errors) {
         // TODO: if user email/name already exists?

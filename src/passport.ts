@@ -21,17 +21,15 @@ passport.use(
             message: `User with email ${email} not found.`
           });
         }
-        user.validatePassword(password, (err, isMatch) => {
-          if (err) return done(err);
-          if (isMatch) {
-            if (user.isActive) return done(undefined, _.omit(user, "password"));
-            return done(undefined, false, {
-              message: "User is not active. Check your email to activate."
-            });
-          }
+        const isMatch = await user.validatePassword(password);
+        if (isMatch) {
+          if (user.isActive) return done(undefined, _.omit(user, "password"));
           return done(undefined, false, {
-            message: "Invalid email or password."
+            message: "User is not active. Check your email to activate."
           });
+        }
+        return done(undefined, false, {
+          message: "Invalid email or password."
         });
       } catch (err) {
         done(err);

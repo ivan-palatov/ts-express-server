@@ -15,16 +15,16 @@ enum Gender {
 
 type callback = (err: any, isMatch: boolean) => any;
 
-@pre<User>("save", function(next) {
+@pre<User>("save", async function(next) {
   if (!this.isModified("password")) return next();
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) return next();
-    bcrypt.hash(this.password, salt, (error, hash) => {
-      if (error) return next();
-      this.password = hash;
-      next();
-    });
-  });
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(this.password, salt);
+    this.password = hash;
+    next();
+  } catch (error) {
+    return next(error);
+  }
 })
 @plugin(paginate)
 @plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, historyField: "slugHistory" })
@@ -47,9 +47,6 @@ class User extends Typegoose {
   @prop({ required: true })
   password: string;
 
-  @prop()
-  age?: number;
-
   @prop({ enum: Gender })
   gender: Gender;
 
@@ -63,10 +60,13 @@ class User extends Typegoose {
   activationCode: string;
 
   @instanceMethod
-  validatePassword(this: InstanceType<User>, pw: string, done: callback): void {
-    bcrypt.compare(pw, this.password, (err, isMatch) => {
-      done(err, isMatch);
-    });
+  async validatePassword(this: InstanceType<User>, pw: string): Promise<boolean> {
+    try {
+      return await bcrypt.compare(pw, this.password);
+    } catch (error) {
+      throw new Error(error);
+    }
+    
   }
 }
 

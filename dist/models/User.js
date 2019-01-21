@@ -8,6 +8,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt = require("bcrypt");
 const limax = require("limax");
@@ -22,9 +30,14 @@ var Gender;
     Gender["FEMALE"] = "female";
 })(Gender || (Gender = {}));
 let User = class User extends typegoose_1.Typegoose {
-    validatePassword(pw, done) {
-        bcrypt.compare(pw, this.password, (err, isMatch) => {
-            done(err, isMatch);
+    validatePassword(pw) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield bcrypt.compare(pw, this.password);
+            }
+            catch (error) {
+                throw new Error(error);
+            }
         });
     }
 };
@@ -40,10 +53,6 @@ __decorate([
     typegoose_1.prop({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
-__decorate([
-    typegoose_1.prop(),
-    __metadata("design:type", Number)
-], User.prototype, "age", void 0);
 __decorate([
     typegoose_1.prop({ enum: Gender }),
     __metadata("design:type", String)
@@ -63,26 +72,27 @@ __decorate([
 __decorate([
     typegoose_1.instanceMethod,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Function]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
 ], User.prototype, "validatePassword", null);
 User = __decorate([
     typegoose_1.pre("save", function (next) {
-        if (!this.isModified("password"))
-            return next();
-        bcrypt.genSalt(10, (err, salt) => {
-            if (err)
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isModified("password"))
                 return next();
-            bcrypt.hash(this.password, salt, (error, hash) => {
-                if (error)
-                    return next();
+            try {
+                const salt = yield bcrypt.genSalt(10);
+                const hash = yield bcrypt.hash(this.password, salt);
                 this.password = hash;
                 next();
-            });
+            }
+            catch (error) {
+                return next(error);
+            }
         });
     }),
     typegoose_1.plugin(paginate),
-    typegoose_1.plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, histoyField: "slugHistory" })
+    typegoose_1.plugin(mongooseSlugPlugin, { tmpl: "<%=name%>", slug: limax, historyField: "slugHistory" })
 ], User);
 const userModel = new User().getModelForClass(User, { schemaOptions: { timestamps: true } });
 exports.User = userModel;
