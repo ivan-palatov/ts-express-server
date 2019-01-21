@@ -2,6 +2,7 @@ import express = require("express");
 const router = express.Router();
 import { Request, Response } from "express";
 import { validationResult } from "express-validator/check";
+import passwordGenerator = require("password-generator");
 
 import { User } from "../models/User";
 import { transporter } from "../nodemailer";
@@ -99,6 +100,32 @@ router.get("/activate/:code", async (req, res) => {
   } catch (errors) {
     req.flash("error", "Can't find a user with that activation code.");
     res.redirect("/auth");
+  }
+});
+
+// Reset password form
+router.get("/reset-password", (req, res) => {
+  res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+});
+
+// Handle reset password request
+router.post("/reset-password", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      req.flash("error", "User with that email doesn't exist.");
+      return res.redirect("/reset-password");
+    }
+    const password = passwordGenerator(Math.floor(Math.random() * 5 + 8), false);
+    user.password = password;
+    // TODO: send mail
+    await user.save();
+    req.flash("info", "We send a new password to your email.");
+    res.redirect("/login");
+  } catch (errors) {
+    // TODO: actual error messages maybe?
+    req.flash("error", "Something went wrong");
+    res.redirect("/reset-password");
   }
 });
 
