@@ -1,4 +1,4 @@
-export const mailOptions = (to: string, actCode: string, siteAddress: string): any => {
+export const confirmEmailOptions = (to: string, actCode: string, siteAddress: string): any => {
   return {
     to,
     subject: "Confirm your email.",

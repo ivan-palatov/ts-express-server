@@ -3,10 +3,13 @@ const router = express.Router();
 import { Request, Response } from "express";
 import { validationResult } from "express-validator/check";
 import passwordGenerator = require("password-generator");
+// tslint:disable-next-line
+import uuidv4 = require("uuid/v4");
 
 import { User } from "../models/User";
 import { transporter } from "../nodemailer";
-import { mailOptions } from "../notifications/confirmEmail";
+import { confirmEmailOptions } from "../notifications/confirmEmail";
+import { forgotPasswordOptions } from "../notifications/forgotPassword";
 import { passport, unauthOnly } from "../passport";
 import { authValidator, registerValidator } from "../validators/authValidator";
 
@@ -73,7 +76,7 @@ router.post(
       const user = await new User({ email, name, password }).save();
       // Send activation email
       await transporter.sendMail(
-        mailOptions(user.email, user.activationCode, "http://localhost:3000")
+        confirmEmailOptions(user.email, user.activationCode, "http://localhost:3000")
       );
       // Show info message and redirect to main page
       req.flash("info", "You have successfuly registered, please confirm your email to continue.");
@@ -103,29 +106,29 @@ router.get("/activate/:code", async (req, res) => {
   }
 });
 
-// Reset password form
-router.get("/reset-password", (req, res) => {
-  res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+// Forgot password form
+router.get("/forgot-password", (req, res) => {
+  res.render("forgotPassword", { title: "Forgot password", error: req.flash("error") });
 });
 
-// Handle reset password request
-router.post("/reset-password", async (req, res) => {
+// Handle forgot password request
+router.post("/forgot-password", async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email, isActive: true });
     if (!user) {
-      req.flash("error", "User with that email doesn't exist.");
-      return res.redirect("/reset-password");
+      req.flash("error", "User with that email doesn't exist or hasn't been activated yet.");
+      return res.redirect("/forgot-password");
     }
-    const password = passwordGenerator(Math.floor(Math.random() * 5 + 8), false);
-    user.password = password;
-    // TODO: send mail
+    const uuid = uuidv4();
+    user.activationCode = uuid;
+    await transporter.sendMail(forgotPasswordOptions(user.email, uuid, "http://localhost:3000"));
     await user.save();
-    req.flash("info", "We send a new password to your email.");
+    req.flash("info", "Check your email to change your password.");
     res.redirect("/login");
   } catch (errors) {
     // TODO: actual error messages maybe?
     req.flash("error", "Something went wrong");
-    res.redirect("/reset-password");
+    res.redirect("/forgot-password");
   }
 });
 
