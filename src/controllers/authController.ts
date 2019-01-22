@@ -99,7 +99,10 @@ router.get("/activate/:code", async (req, res) => {
     user.isActive = true;
     user.save();
     req.flash("info", "Successfuly activated!");
-    res.redirect("/auth");
+    req.login(user, err => {
+      if (err) return res.redirect("/auth");
+    })
+    res.redirect("/profile/me");
   } catch (errors) {
     req.flash("error", "Can't find a user with that activation code.");
     res.redirect("/auth");
@@ -167,7 +170,7 @@ router.post("/reset-password", async (req, res) => {
     await user.save();
     req.flash("info", "You have successfuly changed your password.");
     req.login(user, err => {
-      if (err) return res.redirect("/login");
+      if (err) return res.redirect("/auth");
     });
     res.redirect("profile/me");
   } catch (errors) {

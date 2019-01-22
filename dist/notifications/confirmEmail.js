@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mailOptions = (to, actCode, siteAddress) => {
+exports.confirmEmailOptions = (to, actCode, siteAddress) => {
     return {
         to,
         subject: "Confirm your email.",
