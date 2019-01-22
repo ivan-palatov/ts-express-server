@@ -103,12 +103,20 @@ router.get("/activate/:code", (req, res) => __awaiter(this, void 0, void 0, func
 }));
 // Forgot password form
 router.get("/forgot-password", passport_1.unauthOnly("/profile/me"), (req, res) => {
-    res.render("forgotPassword", { error: req.flash("error") });
+    // If errors, parse them
+    let errors = req.flash("errors")[0];
+    errors = errors ? JSON.parse(errors) : null;
+    res.render("forgotPassword", { errors, error: req.flash("error") });
 });
 // Handle forgot password request
-// TODO: validate email field
-router.post("/forgot-password", passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.post("/forgot-password", passport_1.unauthOnly("/profile/me"), authValidator_1.emailValidator, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
+        // Check for validation errors
+        const errors = check_1.validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash("errors", JSON.stringify(errors.mapped()));
+            return res.redirect("/forgot-password");
+        }
         const user = yield User_1.User.findOne({ email: req.body.email, isActive: true });
         if (!user) {
             req.flash("error", "User with that email doesn't exist or hasn't been activated yet.");
@@ -129,12 +137,15 @@ router.post("/forgot-password", passport_1.unauthOnly("/profile/me"), (req, res)
 // Show password reset form
 router.get("/reset-password/:code", passport_1.unauthOnly("profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
-        const user = yield User_1.User.find({ activationCode: req.params.code, isActive: true }, { activationCode: 1 }).limit(1);
+        const user = yield User_1.User.findOne({ activationCode: req.params.code, isActive: true }, { activationCode: 1 });
         if (!user) {
-            req.flash("error", "Invalid password reset code, please try again.");
-            res.redirect("/");
+            req.flash("error", "Invalid password reset code.");
+            return res.redirect("/");
         }
-        res.render("resetPassword", { error: req.flash("error") });
+        // If errors, parse them
+        let errors = req.flash("errors")[0];
+        errors = errors ? JSON.parse(errors) : null;
+        res.render("resetPassword", { errors, error: req.flash("error") });
     }
     catch (errors) {
         req.flash("error", "Something went wrong");
@@ -143,8 +154,14 @@ router.get("/reset-password/:code", passport_1.unauthOnly("profile/me"), (req, r
 }));
 // Handle password reset
 // TODO: validate password and password2
-router.post("/reset-password", passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.post("/reset-password/:code", passport_1.unauthOnly("/profile/me"), authValidator_1.passwordsValidator, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
+        // Check for validation errors
+        const errors = check_1.validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash("errors", JSON.stringify(errors.mapped()));
+            return res.redirect("back");
+        }
         const user = yield User_1.User.findOne({ activationCode: req.params.code, isActive: true }, { activationCode: 1 });
         if (!user) {
             req.flash("error", "Invalid password reset code, please try again.");

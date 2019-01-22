@@ -11,7 +11,7 @@ import { transporter } from "../nodemailer";
 import { confirmEmailOptions } from "../notifications/confirmEmail";
 import { forgotPasswordOptions } from "../notifications/forgotPassword";
 import { passport, unauthOnly } from "../passport";
-import { authValidator, registerValidator } from "../validators/authValidator";
+import { authValidator, emailValidator, passwordsValidator, registerValidator } from "../validators/authValidator";
 
 // Show auth form
 router.get("/login", unauthOnly("/profile/me"), (req, res) => {
@@ -110,13 +110,21 @@ router.get("/activate/:code", async (req, res) => {
 
 // Forgot password form
 router.get("/forgot-password", unauthOnly("/profile/me"), (req, res) => {
-  res.render("forgotPassword", { error: req.flash("error") });
+  // If errors, parse them
+  let errors = req.flash("errors")[0];
+  errors = errors ? JSON.parse(errors) : null;
+  res.render("forgotPassword", { errors, error: req.flash("error") });
 });
 
 // Handle forgot password request
-// TODO: validate email field
-router.post("/forgot-password", unauthOnly("/profile/me"), async (req, res) => {
+router.post("/forgot-password", unauthOnly("/profile/me"), emailValidator, async (req: Request, res: Response) => {
   try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash("errors", JSON.stringify(errors.mapped()));
+      return res.redirect("/forgot-password");
+    }
     const user = await User.findOne({ email: req.body.email, isActive: true });
     if (!user) {
       req.flash("error", "User with that email doesn't exist or hasn't been activated yet.");
@@ -137,15 +145,18 @@ router.post("/forgot-password", unauthOnly("/profile/me"), async (req, res) => {
 // Show password reset form
 router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) => {
   try {
-    const user = await User.find(
+    const user = await User.findOne(
       { activationCode: req.params.code, isActive: true },
       { activationCode: 1 }
-    ).limit(1);
+    );
     if (!user) {
-      req.flash("error", "Invalid password reset code, please try again.");
-      res.redirect("/");
+      req.flash("error", "Invalid password reset code.");
+      return res.redirect("/");
     }
-    res.render("resetPassword", { error: req.flash("error") });
+    // If errors, parse them
+    let errors = req.flash("errors")[0];
+    errors = errors ? JSON.parse(errors) : null;
+    res.render("resetPassword", { errors, error: req.flash("error") });
   } catch (errors) {
     req.flash("error", "Something went wrong");
     res.redirect("/");
@@ -154,8 +165,14 @@ router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) =
 
 // Handle password reset
 // TODO: validate password and password2
-router.post("/reset-password", unauthOnly("/profile/me"), async (req, res) => {
+router.post("/reset-password/:code", unauthOnly("/profile/me"), passwordsValidator, async (req: Request, res: Response) => {
   try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash("errors", JSON.stringify(errors.mapped()));
+      return res.redirect("back");
+    }
     const user = await User.findOne(
       { activationCode: req.params.code, isActive: true },
       { activationCode: 1 }

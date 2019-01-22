@@ -79,4 +79,24 @@ exports.emailValidator = [
         yahoo_lowercase: true
     })
 ];
+exports.passwordsValidator = [
+    check_1.body("password")
+        .exists()
+        .withMessage("Password field is required.")
+        .isString()
+        .withMessage("Password should be a string.")
+        .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!$%@#£€*?&]{8,}$/)
+        .withMessage("Password should be at least 8 symbols long, contain at least one number and one letter."),
+    check_1.body("password2")
+        .exists()
+        .withMessage("Password confirmation field is required.")
+        .custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error("Passwords must match.");
+        }
+        else {
+            return value;
+        }
+    })
+];
 //# sourceMappingURL=authValidator.js.map
