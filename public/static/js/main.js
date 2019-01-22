@@ -52,18 +52,11 @@ if (errors && path == "register") {
 if (errors && path == "forgot-password") {
   // Display errors on form elements
   $("#email").addClass("is-danger");
-  $("#email")
-    .next()
-    .next()
-    .after(`<div class="help is-danger">${errors.email.msg}</div>`);
+  $(".help.is-info").after(`<div class="help is-danger">${errors.email.msg}</div>`);
   // Remove errors on change
   $("#email").on("change", function() {
     $("#email").removeClass("is-danger");
-    $("#email")
-      .next()
-      .next()
-      .next()
-      .hide(300, "linear");
+    $(".help.is-danger").hide(300, "linear");
   });
 }
 
@@ -72,11 +65,18 @@ if (errors && path == "reset-password") {
   // Display errors on form elements
   for (const key in errors) {
     $(`#${key}`).addClass("is-danger");
-    $(`#${key}`).next().next().after(`<div class="help is-danger">${errors[key].msg}</div>`);
+    $(`#${key}`)
+      .next()
+      .next()
+      .after(`<div class="help is-danger">${errors[key].msg}</div>`);
     // Remove errors on change
     $(`#${key}`).on("change", function() {
       $(`#${key}`).removeClass("is-danger");
-      $(`#${key}`).next().next().next().hide(300, "linear");
+      $(`#${key}`)
+        .next()
+        .next()
+        .next()
+        .hide(300, "linear");
     });
   }
 }

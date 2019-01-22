@@ -153,7 +153,6 @@ router.get("/reset-password/:code", passport_1.unauthOnly("profile/me"), (req, r
     }
 }));
 // Handle password reset
-// TODO: validate password and password2
 router.post("/reset-password/:code", passport_1.unauthOnly("/profile/me"), authValidator_1.passwordsValidator, (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         // Check for validation errors

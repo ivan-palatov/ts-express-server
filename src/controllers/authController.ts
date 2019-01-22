@@ -164,7 +164,6 @@ router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) =
 });
 
 // Handle password reset
-// TODO: validate password and password2
 router.post("/reset-password/:code", unauthOnly("/profile/me"), passwordsValidator, async (req: Request, res: Response) => {
   try {
     // Check for validation errors
