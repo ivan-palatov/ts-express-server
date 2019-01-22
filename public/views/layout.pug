@@ -17,10 +17,13 @@ html(lang="en")
           h1.title.has-text-centered
             a(href="/") CoolSite.com
       .level-right
-        p.level-item.has-text-centered
-          a(href="/login" class="button is-success is-outlined is-medium") Login
-        p.level-item.has-text-centered
-          a(href="/register" class="button is-success is-outlined is-medium") Register
+        if !user
+          p.level-item.has-text-centered
+            a(href="/login" class="button is-success is-outlined is-medium") Login
+          p.level-item.has-text-centered
+            a(href="/register" class="button is-success is-outlined is-medium") Register
+        else
+          p.level-item.has-text-centered Hi, #{user.name}
     .columns.is-centered
       .column.is-two-thirds
         if error && error.length > 0

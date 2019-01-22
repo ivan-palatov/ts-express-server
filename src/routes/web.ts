@@ -8,7 +8,7 @@ router.use('/', authController);
 
 // Other routes
 router.get("*", (req, res) => {
-  res.render("index", { info: req.flash("info"), error: req.flash("error") });
+  res.render("index", { info: req.flash("info"), error: req.flash("error"), user: req.user });
 });
 
 export { router as webRoutes };

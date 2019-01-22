@@ -40,9 +40,9 @@ router.post("/login", authValidator_1.authValidator, passport_1.passport.authent
     const errors = check_1.validationResult(req);
     if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
+        req.flash("form", JSON.stringify({ email: req.body.email }));
         return res.redirect("/register");
     }
-    req.flash("form", JSON.stringify({ email: req.body.email }));
     res.render("index", { user: req.user });
 });
 // Show register form
@@ -62,9 +62,9 @@ router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnl
         const errors = check_1.validationResult(req);
         if (!errors.isEmpty()) {
             req.flash("errors", JSON.stringify(errors.mapped()));
+            req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
             return res.redirect("/register");
         }
-        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
         // If validation passed, proceed to register user
         const { email, name, password } = req.body;
         const user = yield new User_1.User({ email, name, password }).save();
@@ -102,12 +102,12 @@ router.get("/activate/:code", (req, res) => __awaiter(this, void 0, void 0, func
     }
 }));
 // Forgot password form
-router.get("/forgot-password", (req, res) => {
+router.get("/forgot-password", passport_1.unauthOnly("/profile/me"), (req, res) => {
     res.render("forgotPassword", { error: req.flash("error") });
 });
 // Handle forgot password request
 // TODO: validate email field
-router.post("/forgot-password", (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.post("/forgot-password", passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const user = yield User_1.User.findOne({ email: req.body.email, isActive: true });
         if (!user) {
@@ -127,7 +127,7 @@ router.post("/forgot-password", (req, res) => __awaiter(this, void 0, void 0, fu
     }
 }));
 // Show password reset form
-router.get("/reset-password/:code", (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.get("/reset-password/:code", passport_1.unauthOnly("profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const user = yield User_1.User.find({ activationCode: req.params.code, isActive: true }, { activationCode: 1 }).limit(1);
         if (!user) {
@@ -143,7 +143,7 @@ router.get("/reset-password/:code", (req, res) => __awaiter(this, void 0, void 0
 }));
 // Handle password reset
 // TODO: validate password and password2
-router.post("/reset-password", (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.post("/reset-password", passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
     try {
         const user = yield User_1.User.findOne({ activationCode: req.params.code, isActive: true }, { activationCode: 1 });
         if (!user) {

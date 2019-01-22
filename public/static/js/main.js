@@ -2,15 +2,12 @@
 $(".delete").on("click", function() {
   $(".notification").hide(500, "linear");
 });
-
-// Set values to what they were before the request
-if (form) {
-  $("#email").val(form.email);
-  $("#name").val(form.name);
-}
-
+console.log(form);
+console.log(errors);
 // Handle validation errors on auth form
 if (errors && path == "auth") {
+  // Set the values to what they were on request
+  $("#email").val(form.email);
   // Display errors
   for (const key in errors) {
     $(`#${key}`).addClass("is-danger");
@@ -25,6 +22,9 @@ if (errors && path == "auth") {
 
 // Handle validation errors on register form
 if (errors && path == "register") {
+  // Set the values to what they were on request
+  $("#email").val(form.email);
+  $("#name").val(form.name);
   // Display errors on form elements
   for (const key in errors) {
     $(`#${key}`).addClass("is-danger");

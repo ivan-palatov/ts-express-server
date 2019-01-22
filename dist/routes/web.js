@@ -8,6 +8,6 @@ const authController_1 = require("../controllers/authController");
 router.use('/', authController_1.authController);
 // Other routes
 router.get("*", (req, res) => {
-    res.render("index", { info: req.flash("info"), error: req.flash("error") });
+    res.render("index", { info: req.flash("info"), error: req.flash("error"), user: req.user });
 });
 //# sourceMappingURL=web.js.map

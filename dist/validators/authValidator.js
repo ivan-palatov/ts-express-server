@@ -64,4 +64,19 @@ exports.authValidator = [
         .isString()
         .withMessage("Password should be a string")
 ];
+exports.emailValidator = [
+    check_1.body("email")
+        .exists()
+        .withMessage("Email field is required.")
+        .isEmail()
+        .withMessage("Invalid email.")
+        .trim()
+        .normalizeEmail({
+        gmail_convert_googlemaildotcom: true,
+        gmail_lowercase: true,
+        icloud_lowercase: true,
+        outlookdotcom_lowercase: true,
+        yahoo_lowercase: true
+    })
+];
 //# sourceMappingURL=authValidator.js.map

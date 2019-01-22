@@ -67,3 +67,19 @@ export const authValidator = [
     .isString()
     .withMessage("Password should be a string")
 ];
+
+export const emailValidator = [
+  body("email")
+    .exists()
+    .withMessage("Email field is required.")
+    .isEmail()
+    .withMessage("Invalid email.")
+    .trim()
+    .normalizeEmail({
+      gmail_convert_googlemaildotcom: true,
+      gmail_lowercase: true,
+      icloud_lowercase: true,
+      outlookdotcom_lowercase: true,
+      yahoo_lowercase: true
+    })
+];

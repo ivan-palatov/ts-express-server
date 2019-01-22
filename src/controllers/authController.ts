@@ -38,9 +38,9 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       req.flash("errors", JSON.stringify(errors.mapped()));
+      req.flash("form", JSON.stringify({ email: req.body.email }));
       return res.redirect("/register");
     }
-    req.flash("form", JSON.stringify({ email: req.body.email }));
     res.render("index", { user: req.user });
   }
 );
@@ -67,9 +67,9 @@ router.post(
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
+        req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
         return res.redirect("/register");
       }
-      req.flash("form", JSON.stringify({ email: req.body.email, name: req.body.name }));
       // If validation passed, proceed to register user
       const { email, name, password } = req.body;
       const user = await new User({ email, name, password }).save();
@@ -109,13 +109,13 @@ router.get("/activate/:code", async (req, res) => {
 });
 
 // Forgot password form
-router.get("/forgot-password", (req, res) => {
+router.get("/forgot-password", unauthOnly("/profile/me"), (req, res) => {
   res.render("forgotPassword", { error: req.flash("error") });
 });
 
 // Handle forgot password request
 // TODO: validate email field
-router.post("/forgot-password", async (req, res) => {
+router.post("/forgot-password", unauthOnly("/profile/me"), async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email, isActive: true });
     if (!user) {
@@ -135,7 +135,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 
 // Show password reset form
-router.get("/reset-password/:code", async (req, res) => {
+router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) => {
   try {
     const user = await User.find(
       { activationCode: req.params.code, isActive: true },
@@ -154,7 +154,7 @@ router.get("/reset-password/:code", async (req, res) => {
 
 // Handle password reset
 // TODO: validate password and password2
-router.post("/reset-password", async (req, res) => {
+router.post("/reset-password", unauthOnly("/profile/me"), async (req, res) => {
   try {
     const user = await User.findOne(
       { activationCode: req.params.code, isActive: true },
