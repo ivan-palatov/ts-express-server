@@ -112,6 +112,7 @@ router.get("/forgot-password", (req, res) => {
 });
 
 // Handle forgot password request
+// TODO: validate email field
 router.post("/forgot-password", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email, isActive: true });
@@ -134,7 +135,9 @@ router.post("/forgot-password", async (req, res) => {
 // Show password reset form
 router.get("/reset-password/:code", async (req, res) => {
   try {
-    const user = await User.find({ activationCode: req.params.code }, { activationCode: 1 }).limit(1);
+    const user = await User
+      .find({ activationCode: req.params.code }, { activationCode: 1 })
+      .limit(1);
     if (!user) {
       req.flash("error", "Invalid password reset code, please try again.");
       res.redirect("/");
@@ -144,7 +147,24 @@ router.get("/reset-password/:code", async (req, res) => {
     req.flash("error", "Something went wrong");
     res.redirect("/");
   }
-  
+});
+
+// Handle password reset
+// TODO: validate password and password2
+router.post("/reset-password", async (req, res) => {
+  try {
+    const user = await User.findOne({ activationCode: req.params.code }, { activationCode: 1 })
+    if (!user) {
+      req.flash("error", "Invalid password reset code, please try again.");
+      res.redirect("/");
+    }
+    user.password = req.body.password;
+    await user.save();
+    res.redirect("/login");
+  } catch (errors) {
+    req.flash("error", "Something went wrong");
+    res.redirect("/");
+  }
 });
 
 
