@@ -126,10 +126,26 @@ router.post("/forgot-password", async (req, res) => {
     req.flash("info", "Check your email to change your password.");
     res.redirect("/login");
   } catch (errors) {
-    // TODO: actual error messages maybe?
     req.flash("error", "Something went wrong");
     res.redirect("/forgot-password");
   }
 });
+
+// Show password reset form
+router.get("/reset-password/:code", async (req, res) => {
+  try {
+    const user = await User.find({ activationCode: req.params.code }, { activationCode: 1 }).limit(1);
+    if (!user) {
+      req.flash("error", "Invalid password reset code, please try again.");
+      res.redirect("/");
+    }
+    res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+  } catch (errors) {
+    req.flash("error", "Something went wrong");
+    res.redirect("/");
+  }
+  
+});
+
 
 export { router as authController };
