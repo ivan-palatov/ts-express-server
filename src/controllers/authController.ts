@@ -2,7 +2,6 @@ import express = require("express");
 const router = express.Router();
 import { Request, Response } from "express";
 import { validationResult } from "express-validator/check";
-import passwordGenerator = require("password-generator");
 // tslint:disable-next-line
 import uuidv4 = require("uuid/v4");
 
@@ -11,7 +10,12 @@ import { transporter } from "../nodemailer";
 import { confirmEmailOptions } from "../notifications/confirmEmail";
 import { forgotPasswordOptions } from "../notifications/forgotPassword";
 import { passport, unauthOnly } from "../passport";
-import { authValidator, emailValidator, passwordsValidator, registerValidator } from "../validators/authValidator";
+import {
+  authValidator,
+  emailValidator,
+  passwordsValidator,
+  registerValidator
+} from "../validators/authValidator";
 
 // Show auth form
 router.get("/login", unauthOnly("/profile/me"), (req, res) => {
@@ -117,30 +121,35 @@ router.get("/forgot-password", unauthOnly("/profile/me"), (req, res) => {
 });
 
 // Handle forgot password request
-router.post("/forgot-password", unauthOnly("/profile/me"), emailValidator, async (req: Request, res: Response) => {
-  try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      req.flash("errors", JSON.stringify(errors.mapped()));
-      return res.redirect("/forgot-password");
+router.post(
+  "/forgot-password",
+  unauthOnly("/profile/me"),
+  emailValidator,
+  async (req: Request, res: Response) => {
+    try {
+      // Check for validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        req.flash("errors", JSON.stringify(errors.mapped()));
+        return res.redirect("/forgot-password");
+      }
+      const user = await User.findOne({ email: req.body.email, isActive: true });
+      if (!user) {
+        req.flash("error", "User with that email doesn't exist or hasn't been activated yet.");
+        return res.redirect("/forgot-password");
+      }
+      const uuid = uuidv4();
+      user.activationCode = uuid;
+      await transporter.sendMail(forgotPasswordOptions(user.email, uuid, "http://localhost:3000"));
+      await user.save();
+      req.flash("info", "Check your email to change your password.");
+      res.redirect("/login");
+    } catch (errors) {
+      req.flash("error", "Something went wrong");
+      res.redirect("/forgot-password");
     }
-    const user = await User.findOne({ email: req.body.email, isActive: true });
-    if (!user) {
-      req.flash("error", "User with that email doesn't exist or hasn't been activated yet.");
-      return res.redirect("/forgot-password");
-    }
-    const uuid = uuidv4();
-    user.activationCode = uuid;
-    await transporter.sendMail(forgotPasswordOptions(user.email, uuid, "http://localhost:3000"));
-    await user.save();
-    req.flash("info", "Check your email to change your password.");
-    res.redirect("/login");
-  } catch (errors) {
-    req.flash("error", "Something went wrong");
-    res.redirect("/forgot-password");
   }
-});
+);
 
 // Show password reset form
 router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) => {
@@ -164,35 +173,40 @@ router.get("/reset-password/:code", unauthOnly("profile/me"), async (req, res) =
 });
 
 // Handle password reset
-router.post("/reset-password/:code", unauthOnly("/profile/me"), passwordsValidator, async (req: Request, res: Response) => {
-  try {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      req.flash("errors", JSON.stringify(errors.mapped()));
-      return res.redirect("back");
-    }
-    const user = await User.findOne(
-      { activationCode: req.params.code, isActive: true },
-      { activationCode: 1 }
-    );
-    if (!user) {
-      req.flash("error", "Invalid password reset code, please try again.");
+router.post(
+  "/reset-password/:code",
+  unauthOnly("/profile/me"),
+  passwordsValidator,
+  async (req: Request, res: Response) => {
+    try {
+      // Check for validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        req.flash("errors", JSON.stringify(errors.mapped()));
+        return res.redirect("back");
+      }
+      const user = await User.findOne(
+        { activationCode: req.params.code, isActive: true },
+        { activationCode: 1 }
+      );
+      if (!user) {
+        req.flash("error", "Invalid password reset code, please try again.");
+        res.redirect("/");
+      }
+      user.password = req.body.password;
+      user.activationCode = "";
+      await user.save();
+      req.flash("info", "You have successfuly changed your password.");
+      req.login(user, err => {
+        if (err) return res.redirect("/login");
+      });
+      res.redirect("profile/me");
+    } catch (errors) {
+      req.flash("error", "Something went wrong");
       res.redirect("/");
     }
-    user.password = req.body.password;
-    user.activationCode = "";
-    await user.save();
-    req.flash("info", "You have successfuly changed your password.");
-    req.login(user, err => {
-      if (err) return res.redirect("/login");
-    });
-    res.redirect("profile/me");
-  } catch (errors) {
-    req.flash("error", "Something went wrong");
-    res.redirect("/");
   }
-});
+);
 
 // Handle logout request
 router.get("/logout", (req, res) => {
