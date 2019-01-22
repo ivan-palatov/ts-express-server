@@ -166,4 +166,9 @@ router.post("/reset-password", (req, res) => __awaiter(this, void 0, void 0, fun
         res.redirect("/");
     }
 }));
+// Handle logout request
+router.get("/logout", (req, res) => {
+    req.logout();
+    res.redirect("/");
+});
 //# sourceMappingURL=authController.js.map

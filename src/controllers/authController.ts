@@ -101,7 +101,7 @@ router.get("/activate/:code", async (req, res) => {
     req.flash("info", "Successfuly activated!");
     req.login(user, err => {
       if (err) return res.redirect("/auth");
-    })
+    });
     res.redirect("/profile/me");
   } catch (errors) {
     req.flash("error", "Can't find a user with that activation code.");
@@ -177,6 +177,12 @@ router.post("/reset-password", async (req, res) => {
     req.flash("error", "Something went wrong");
     res.redirect("/");
   }
+});
+
+// Handle logout request
+router.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
 });
 
 export { router as authController };
