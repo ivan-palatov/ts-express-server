@@ -135,9 +135,10 @@ router.post("/forgot-password", async (req, res) => {
 // Show password reset form
 router.get("/reset-password/:code", async (req, res) => {
   try {
-    const user = await User
-      .find({ activationCode: req.params.code }, { activationCode: 1 })
-      .limit(1);
+    const user = await User.find(
+      { activationCode: req.params.code, isActive: true },
+      { activationCode: 1 }
+    ).limit(1);
     if (!user) {
       req.flash("error", "Invalid password reset code, please try again.");
       res.redirect("/");
@@ -153,19 +154,26 @@ router.get("/reset-password/:code", async (req, res) => {
 // TODO: validate password and password2
 router.post("/reset-password", async (req, res) => {
   try {
-    const user = await User.findOne({ activationCode: req.params.code }, { activationCode: 1 })
+    const user = await User.findOne(
+      { activationCode: req.params.code, isActive: true },
+      { activationCode: 1 }
+    );
     if (!user) {
       req.flash("error", "Invalid password reset code, please try again.");
       res.redirect("/");
     }
     user.password = req.body.password;
+    user.activationCode = "";
     await user.save();
-    res.redirect("/login");
+    req.flash("info", "You have successfuly changed your password.");
+    req.login(user, err => {
+      if (err) return res.redirect("/login");
+    });
+    res.redirect("profile/me");
   } catch (errors) {
     req.flash("error", "Something went wrong");
     res.redirect("/");
   }
 });
-
 
 export { router as authController };
