@@ -14,17 +14,16 @@ import { passport, unauthOnly } from "../passport";
 import { authValidator, registerValidator } from "../validators/authValidator";
 
 // Show auth form
-router.get("/auth", unauthOnly("/profile/me"), (req, res) => {
+router.get("/login", unauthOnly("/profile/me"), (req, res) => {
   // If errors, parse them
   let errors = req.flash("errors")[0];
   errors = errors ? JSON.parse(errors) : null;
   // If form was send before, parse the params back
   let form = req.flash("form")[0];
   form = form ? JSON.parse(form) : null;
-  res.render("auth", {
+  res.render("login", {
     errors,
     form,
-    title: "Login",
     error: req.flash("error"),
     info: req.flash("info")
   });
@@ -32,9 +31,9 @@ router.get("/auth", unauthOnly("/profile/me"), (req, res) => {
 
 // Handle auth request
 router.post(
-  "/auth",
+  "/login",
   authValidator,
-  passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }),
+  passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }),
   (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -42,7 +41,7 @@ router.post(
       return res.redirect("/register");
     }
     req.flash("form", JSON.stringify({ email: req.body.email }));
-    res.render("index", { user: req.user, title: "Main page" });
+    res.render("index", { user: req.user });
   }
 );
 
@@ -54,7 +53,7 @@ router.get("/register", unauthOnly("/profile/me"), (req, res) => {
   // If form was send before, parse the params back
   let form = req.flash("form")[0];
   form = form ? JSON.parse(form) : null;
-  res.render("register", { errors, form, error: req.flash("error"), title: "Register" });
+  res.render("register", { errors, form, error: req.flash("error") });
 });
 
 // Handle register request
@@ -100,18 +99,18 @@ router.get("/activate/:code", async (req, res) => {
     user.save();
     req.flash("info", "Successfuly activated!");
     req.login(user, err => {
-      if (err) return res.redirect("/auth");
+      if (err) return res.redirect("/login");
     });
     res.redirect("/profile/me");
   } catch (errors) {
     req.flash("error", "Can't find a user with that activation code.");
-    res.redirect("/auth");
+    res.redirect("/login");
   }
 });
 
 // Forgot password form
 router.get("/forgot-password", (req, res) => {
-  res.render("forgotPassword", { title: "Forgot password", error: req.flash("error") });
+  res.render("forgotPassword", { error: req.flash("error") });
 });
 
 // Handle forgot password request
@@ -146,7 +145,7 @@ router.get("/reset-password/:code", async (req, res) => {
       req.flash("error", "Invalid password reset code, please try again.");
       res.redirect("/");
     }
-    res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+    res.render("resetPassword", { error: req.flash("error") });
   } catch (errors) {
     req.flash("error", "Something went wrong");
     res.redirect("/");
@@ -170,7 +169,7 @@ router.post("/reset-password", async (req, res) => {
     await user.save();
     req.flash("info", "You have successfuly changed your password.");
     req.login(user, err => {
-      if (err) return res.redirect("/auth");
+      if (err) return res.redirect("/login");
     });
     res.redirect("profile/me");
   } catch (errors) {

@@ -21,30 +21,29 @@ const forgotPassword_1 = require("../notifications/forgotPassword");
 const passport_1 = require("../passport");
 const authValidator_1 = require("../validators/authValidator");
 // Show auth form
-router.get("/auth", passport_1.unauthOnly("/profile/me"), (req, res) => {
+router.get("/login", passport_1.unauthOnly("/profile/me"), (req, res) => {
     // If errors, parse them
     let errors = req.flash("errors")[0];
     errors = errors ? JSON.parse(errors) : null;
     // If form was send before, parse the params back
     let form = req.flash("form")[0];
     form = form ? JSON.parse(form) : null;
-    res.render("auth", {
+    res.render("login", {
         errors,
         form,
-        title: "Login",
         error: req.flash("error"),
         info: req.flash("info")
     });
 });
 // Handle auth request
-router.post("/auth", authValidator_1.authValidator, passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/auth" }), (req, res) => {
+router.post("/login", authValidator_1.authValidator, passport_1.passport.authenticate("local", { failureFlash: true, failureRedirect: "/login" }), (req, res) => {
     const errors = check_1.validationResult(req);
     if (!errors.isEmpty()) {
         req.flash("errors", JSON.stringify(errors.mapped()));
         return res.redirect("/register");
     }
     req.flash("form", JSON.stringify({ email: req.body.email }));
-    res.render("index", { user: req.user, title: "Main page" });
+    res.render("index", { user: req.user });
 });
 // Show register form
 router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {
@@ -54,7 +53,7 @@ router.get("/register", passport_1.unauthOnly("/profile/me"), (req, res) => {
     // If form was send before, parse the params back
     let form = req.flash("form")[0];
     form = form ? JSON.parse(form) : null;
-    res.render("register", { errors, form, error: req.flash("error"), title: "Register" });
+    res.render("register", { errors, form, error: req.flash("error") });
 });
 // Handle register request
 router.post("/register", authValidator_1.registerValidator, passport_1.unauthOnly("/profile/me"), (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -93,18 +92,18 @@ router.get("/activate/:code", (req, res) => __awaiter(this, void 0, void 0, func
         req.flash("info", "Successfuly activated!");
         req.login(user, err => {
             if (err)
-                return res.redirect("/auth");
+                return res.redirect("/login");
         });
         res.redirect("/profile/me");
     }
     catch (errors) {
         req.flash("error", "Can't find a user with that activation code.");
-        res.redirect("/auth");
+        res.redirect("/login");
     }
 }));
 // Forgot password form
 router.get("/forgot-password", (req, res) => {
-    res.render("forgotPassword", { title: "Forgot password", error: req.flash("error") });
+    res.render("forgotPassword", { error: req.flash("error") });
 });
 // Handle forgot password request
 // TODO: validate email field
@@ -135,7 +134,7 @@ router.get("/reset-password/:code", (req, res) => __awaiter(this, void 0, void 0
             req.flash("error", "Invalid password reset code, please try again.");
             res.redirect("/");
         }
-        res.render("resetPassword", { title: "Reset password", error: req.flash("error") });
+        res.render("resetPassword", { error: req.flash("error") });
     }
     catch (errors) {
         req.flash("error", "Something went wrong");
@@ -157,7 +156,7 @@ router.post("/reset-password", (req, res) => __awaiter(this, void 0, void 0, fun
         req.flash("info", "You have successfuly changed your password.");
         req.login(user, err => {
             if (err)
-                return res.redirect("/auth");
+                return res.redirect("/login");
         });
         res.redirect("profile/me");
     }

@@ -1,7 +1,10 @@
 extends layout
 
+block title
+  title CoolSite.com - Login
+
 block content
-  form(action="/auth" method="post")
+  form(action="/login" method="post")
     .columns.is-centered
       .column.is-two-thirds
         h2.title.has-text-centered Login

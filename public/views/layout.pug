@@ -9,7 +9,7 @@ html(lang="en")
     link(href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" rel="stylesheet")
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
     link(href="../../static/css/main.css" rel="stylesheet")
-    title CoolSite.com - #{title}
+    block title
   body
     nav.level.is-mobile
       .level-left
@@ -18,7 +18,7 @@ html(lang="en")
             a(href="/") CoolSite.com
       .level-right
         p.level-item.has-text-centered
-          a(href="/auth" class="button is-success is-outlined is-medium") Login
+          a(href="/login" class="button is-success is-outlined is-medium") Login
         p.level-item.has-text-centered
           a(href="/register" class="button is-success is-outlined is-medium") Register
     .columns.is-centered

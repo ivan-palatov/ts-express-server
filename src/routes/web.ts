@@ -8,7 +8,7 @@ router.use('/', authController);
 
 // Other routes
 router.get("*", (req, res) => {
-  res.render("index", { title: "Main page", info: req.flash("info") });
+  res.render("index", { info: req.flash("info"), error: req.flash("error") });
 });
 
 export { router as webRoutes };
