@@ -191,7 +191,7 @@ router.post(
       );
       if (!user) {
         req.flash("error", "Invalid password reset code, please try again.");
-        res.redirect("/");
+        return res.redirect("/");
       }
       user.password = req.body.password;
       user.activationCode = "";
