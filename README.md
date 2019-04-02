@@ -40,3 +40,7 @@ This project is an **express server boilerplate** using **typescript**.
     # or start production server
     npm start
    ```
+
+### License
+
+MIT
