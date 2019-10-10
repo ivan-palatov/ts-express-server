@@ -20,7 +20,7 @@
     "@types/body-parser": "^1.17.0",
     "@types/compression": "1.0.1",
     "@types/connect-flash": "0.0.35",
-    "@types/connect-mongo": "0.0.41",
+    "@types/connect-mongo": "0.0.44",
     "@types/cookie-parser": "^1.4.1",
     "@types/dotenv": "^6.1.1",
     "@types/errorhandler": "0.0.32",
