@@ -17,7 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
-    "@types/body-parser": "^1.17.0",
+    "@types/body-parser": "^1.17.1",
     "@types/compression": "1.0.1",
     "@types/connect-flash": "0.0.35",
     "@types/connect-mongo": "0.0.44",
