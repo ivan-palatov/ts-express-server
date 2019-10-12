@@ -34,7 +34,7 @@
     "@types/nodemailer": "^6.2.1",
     "@types/passport": "^1.0.0",
     "@types/passport-local": "^1.0.33",
-    "@types/uuid": "^3.4.4",
+    "@types/uuid": "^3.4.5",
     "concurrently": "^5.0.0",
     "errorhandler": "^1.5.0",
     "morgan": "^1.9.1",
